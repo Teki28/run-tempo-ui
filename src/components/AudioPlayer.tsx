@@ -6,6 +6,8 @@ interface AudioPlayerProps {
   audioUrl: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 export default function AudioPlayer({ audioUrl }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -31,7 +33,7 @@ export default function AudioPlayer({ audioUrl }: AudioPlayerProps) {
       </button>
       <audio
         ref={audioRef}
-        src={`http://127.0.0.1:8000${audioUrl}`}
+        src={`${API_URL}${audioUrl}`}
         onEnded={() => setIsPlaying(false)}
         onPause={() => setIsPlaying(false)}
         onPlay={() => setIsPlaying(true)}
