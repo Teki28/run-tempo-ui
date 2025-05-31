@@ -4,8 +4,21 @@ import React, { useState } from 'react';
 import AudioPlayer from './AudioPlayer';
 
 interface ApiResponse {
-  [key: string]: any;
-  audio_url?: string;
+  filename: string;
+  duration_seconds: number;
+  channels: number;
+  sample_width_bytes: number;
+  frame_rate_hz: number;
+  frame_count: number;
+  max_amplitude: number;
+  rms: number;
+  audio_url: string;
+  target_bpm?: number;
+  original_bpm?: number;
+  target_bpm_applied?: number;
+  shorter_file?: string;
+  longer_file?: string;
+  repeat_count?: number;
 }
 
 export default function DataFetcher() {
