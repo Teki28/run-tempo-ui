@@ -22,6 +22,7 @@ interface ApiResponse {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+console.log('API_URL:', API_URL); // Debug log
 
 export default function DataFetcher() {
   const [data, setData] = useState<ApiResponse | null>(null);
@@ -32,14 +33,16 @@ export default function DataFetcher() {
     try {
       setLoading(true);
       setError(null);
+      console.log('Fetching from:', `${API_URL}/`); // Debug log
       const response = await fetch(`${API_URL}/`);
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
       const jsonData = await response.json();
-      console.log(jsonData);
+      console.log('Response:', jsonData); // Debug log
       setData(jsonData);
     } catch (err) {
+      console.error('Fetch error:', err); // Debug log
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
