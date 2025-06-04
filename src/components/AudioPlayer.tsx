@@ -45,7 +45,7 @@ export default function AudioPlayer({ audioUrl }: AudioPlayerProps) {
       </button>
       <audio
         ref={audioRef}
-        src={audioSrc}
+        src={audioSrc || undefined}
         onEnded={() => setIsPlaying(false)}
         onPause={() => setIsPlaying(false)}
         onPlay={() => setIsPlaying(true)}
