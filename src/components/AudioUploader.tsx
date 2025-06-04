@@ -113,7 +113,7 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
     } finally {
       setIsUploading(false);
     }
-  }, [onUploadComplete, onUploadError]);
+  }, [handleNewUpload, onUploadError]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

@@ -1,18 +1,12 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import BpmControls from './BpmControls';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 
 interface AudioControlsProps {
   fileId: string;
-}
-
-interface ProcessedAudioCache {
-  url: string;
-  bpm: number;
-  volume: number;
 }
 
 export default function AudioControls({ fileId }: AudioControlsProps) {
@@ -22,10 +16,10 @@ export default function AudioControls({ fileId }: AudioControlsProps) {
   const [error, setError] = useState<string | null>(null);
   const [bpm, setBpm] = useState(120);
   const [volume, setVolume] = useState(100);  // Default to 100% (normal volume)
-  const [processedCache, setProcessedCache] = useState<ProcessedAudioCache | null>(null);
   
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
   const processedAudioRef = useRef<HTMLAudioElement | null>(null);
+  const currentBlobUrl = useRef<string | null>(null);
 
   const handlePreviewPlay = () => {
     if (!previewAudioRef.current) return;
@@ -37,11 +31,20 @@ export default function AudioControls({ fileId }: AudioControlsProps) {
     }
   };
 
-  const processAudio = async () => {
-    setIsLoading(true);
-    setError(null);
+  const processAndPlayAudio = async () => {
+    if (!processedAudioRef.current) return;
     
     try {
+      setIsLoading(true);
+      setError(null);
+
+      // Clean up previous blob URL if it exists
+      if (currentBlobUrl.current) {
+        URL.revokeObjectURL(currentBlobUrl.current);
+        currentBlobUrl.current = null;
+      }
+
+      // Get processed audio from backend
       const response = await fetch(
         `${API_URL}/preview/process?preview_id=${fileId}&bpm=${bpm}&volume=${volume}`,
         { method: 'POST' }
@@ -51,108 +54,76 @@ export default function AudioControls({ fileId }: AudioControlsProps) {
         throw new Error('Failed to process audio');
       }
 
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      
-      // Clean up old URL if it exists
-      if (processedCache?.url) {
-        URL.revokeObjectURL(processedCache.url);
+      const arrayBuffer = await response.arrayBuffer();
+      if (arrayBuffer.byteLength === 0) {
+        throw new Error('Received empty audio data');
       }
+
+      // Create new blob URL
+      const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+      const url = URL.createObjectURL(blob);
+      currentBlobUrl.current = url;
+
+      // Load and play the audio
+      processedAudioRef.current.src = url;
+      processedAudioRef.current.load();
       
-      // Cache the new processed audio
-      setProcessedCache({
-        url,
-        bpm,
-        volume
+      await new Promise((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          cleanup();
+          reject(new Error('Audio load timeout'));
+        }, 5000);
+
+        const handleCanPlay = () => {
+          cleanup();
+          resolve(undefined);
+        };
+
+        const handleError = () => {
+          cleanup();
+          reject(new Error('Failed to load audio'));
+        };
+
+        const cleanup = () => {
+          clearTimeout(timeoutId);
+          processedAudioRef.current?.removeEventListener('canplaythrough', handleCanPlay);
+          processedAudioRef.current?.removeEventListener('error', handleError);
+        };
+
+        processedAudioRef.current?.addEventListener('canplaythrough', handleCanPlay);
+        processedAudioRef.current?.addEventListener('error', handleError);
       });
-      
-      return url;
+
+      await processedAudioRef.current.play();
+      setIsPlayingProcessed(true);
     } catch (err) {
-      throw err;
+      console.error('Error playing processed audio:', err);
+      setError(err instanceof Error ? err.message : 'Failed to play audio');
+      setIsPlayingProcessed(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleProcessedPlay = async () => {
+  const handleProcessedPlay = () => {
     if (!processedAudioRef.current) return;
 
     if (isPlayingProcessed) {
       processedAudioRef.current.pause();
+      setIsPlayingProcessed(false);
     } else {
-      try {
-        // Check if we need to process the audio
-        const needsProcessing = !processedCache || 
-          processedCache.bpm !== bpm || 
-          processedCache.volume !== volume;
-
-        if (needsProcessing) {
-          setIsLoading(true);
-          const newUrl = await processAudio();
-          
-          // Set the new source
-          processedAudioRef.current.src = newUrl;
-          
-          // Wait for the audio to be loaded before playing
-          await new Promise((resolve) => {
-            const handleCanPlay = () => {
-              processedAudioRef.current?.removeEventListener('canplay', handleCanPlay);
-              resolve(undefined);
-            };
-            processedAudioRef.current?.addEventListener('canplay', handleCanPlay);
-          });
-        }
-
-        await processedAudioRef.current.play();
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setIsLoading(false);
-      }
+      processAndPlayAudio();
     }
   };
 
-  // Clean up object URLs when component unmounts
-  useEffect(() => {
+  // Clean up blob URL when component unmounts
+  React.useEffect(() => {
     return () => {
-      // Clean up object URLs when component unmounts
-      if (processedCache?.url) {
-        URL.revokeObjectURL(processedCache.url);
-      }
-      
-      // Stop any playing audio
-      if (previewAudioRef.current) {
-        previewAudioRef.current.pause();
-        previewAudioRef.current.currentTime = 0;
-      }
-      if (processedAudioRef.current) {
-        processedAudioRef.current.pause();
-        processedAudioRef.current.currentTime = 0;
+      if (currentBlobUrl.current) {
+        URL.revokeObjectURL(currentBlobUrl.current);
       }
     };
   }, []);
-
-  // Handle file ID changes
-  useEffect(() => {
-    // Reset playback state when file ID changes
-    setIsPlayingPreview(false);
-    setIsPlayingProcessed(false);
-    setError(null);
-    
-    // Stop any playing audio
-    if (previewAudioRef.current) {
-      previewAudioRef.current.pause();
-      previewAudioRef.current.currentTime = 0;
-    }
-    if (processedAudioRef.current) {
-      processedAudioRef.current.pause();
-      processedAudioRef.current.currentTime = 0;
-    }
-    
-    // Clean up processed audio cache
-    if (processedCache?.url) {
-      URL.revokeObjectURL(processedCache.url);
-      setProcessedCache(null);
-    }
-  }, [fileId]);
 
   return (
     <div className="space-y-6">

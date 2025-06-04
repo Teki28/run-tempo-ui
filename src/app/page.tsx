@@ -1,20 +1,15 @@
 'use client';
 
 import AudioUploader from '../components/AudioUploader';
-import { useState, useEffect } from 'react';
 
 interface UploadResponse {
-  raw_id: string;
-  preview_id: string | null;
+  id: string;
   message: string;
 }
 
 export default function Home() {
-  const [uploadResponse, setUploadResponse] = useState<UploadResponse | null>(null);
-
   const handleUploadComplete = (response: UploadResponse) => {
     console.log('Upload completed:', response);
-    setUploadResponse(response);
   };
 
   const handleUploadError = (error: string) => {

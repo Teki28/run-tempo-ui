@@ -69,22 +69,24 @@ export default function PreviewPlayer({ previewId }: PreviewPlayerProps) {
     }
   };
 
-  // Clean up object URL when component unmounts
+  // Clean up object URL when component unmounts or when audioUrl changes
   useEffect(() => {
     return () => {
       if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
+        const urlToRevoke = audioUrl;
+        URL.revokeObjectURL(urlToRevoke);
       }
     };
   }, [audioUrl]);
 
   // Reset audio URL when BPM or volume changes
   useEffect(() => {
-    if (audioUrl) {
-      URL.revokeObjectURL(audioUrl);
+    const currentUrl = audioUrl;
+    if (currentUrl) {
+      URL.revokeObjectURL(currentUrl);
       setAudioUrl(null);
     }
-  }, [bpm, volume]);
+  }, [bpm, volume, audioUrl]);
 
   return (
     <div className="mt-4 space-y-4">
