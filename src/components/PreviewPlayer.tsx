@@ -23,7 +23,7 @@ export default function PreviewPlayer({ previewId }: PreviewPlayerProps) {
     setError(null);
     try {
       const response = await fetch(
-        `${API_URL}/preview/process?preview_id=${previewId}&bpm=${bpm}&volume=${volume}`,
+        `${API_URL}/process/preview?preview_id=${previewId}&bpm=${bpm}&volume=${volume}`,
         { method: 'POST' }
       );
       

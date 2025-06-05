@@ -1,18 +1,27 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import BpmControls from './BpmControls';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 
 interface AudioControlsProps {
   fileId: string;
+  onNewFile?: () => void;  // Called when a new file is uploaded or sample is loaded
 }
 
-export default function AudioControls({ fileId }: AudioControlsProps) {
+interface AudioCache {
+  bpm: number;
+  volume: number;
+  blob: Blob | null;
+  url: string | null;
+}
+
+export default function AudioControls({ fileId, onNewFile }: AudioControlsProps) {
   const [isPlayingPreview, setIsPlayingPreview] = useState(false);
   const [isPlayingProcessed, setIsPlayingProcessed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bpm, setBpm] = useState(120);
   const [volume, setVolume] = useState(100);  // Default to 100% (normal volume)
@@ -20,6 +29,36 @@ export default function AudioControls({ fileId }: AudioControlsProps) {
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
   const processedAudioRef = useRef<HTMLAudioElement | null>(null);
   const currentBlobUrl = useRef<string | null>(null);
+  const audioCache = useRef<AudioCache>({
+    bpm: 0,
+    volume: 0,
+    blob: null,
+    url: null
+  });
+
+  // Reset cache when fileId changes (new file uploaded or sample loaded)
+  useEffect(() => {
+    clearCache();
+    if (onNewFile) {
+      onNewFile();
+    }
+  }, [fileId, onNewFile]);
+
+  const clearCache = () => {
+    if (audioCache.current.url) {
+      URL.revokeObjectURL(audioCache.current.url);
+    }
+    audioCache.current = {
+      bpm: 0,
+      volume: 0,
+      blob: null,
+      url: null
+    };
+    if (currentBlobUrl.current) {
+      URL.revokeObjectURL(currentBlobUrl.current);
+      currentBlobUrl.current = null;
+    }
+  };
 
   const handlePreviewPlay = () => {
     if (!previewAudioRef.current) return;
@@ -35,6 +74,21 @@ export default function AudioControls({ fileId }: AudioControlsProps) {
     if (!processedAudioRef.current) return;
     
     try {
+      // Check if we have cached audio with the same settings
+      if (audioCache.current.bpm === bpm && 
+          audioCache.current.volume === volume && 
+          audioCache.current.blob && 
+          audioCache.current.url) {
+        // Use cached audio without showing loading state
+        console.log("Using cached audio");
+        processedAudioRef.current.src = audioCache.current.url;
+        processedAudioRef.current.load();
+        await processedAudioRef.current.play();
+        setIsPlayingProcessed(true);
+        return;
+      }
+
+      // Only show loading state when making a new request
       setIsLoading(true);
       setError(null);
 
@@ -46,7 +100,7 @@ export default function AudioControls({ fileId }: AudioControlsProps) {
 
       // Get processed audio from backend
       const response = await fetch(
-        `${API_URL}/preview/process?preview_id=${fileId}&bpm=${bpm}&volume=${volume}`,
+        `${API_URL}/process/preview?preview_id=${fileId}&bpm=${bpm}&volume=${volume}`,
         { method: 'POST' }
       );
       
@@ -59,49 +113,40 @@ export default function AudioControls({ fileId }: AudioControlsProps) {
         throw new Error('Received empty audio data');
       }
 
-      // Create new blob URL
+      // Create new blob URL and cache it
       const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
       const url = URL.createObjectURL(blob);
+      
+      // Update cache
+      if (audioCache.current.url) {
+        URL.revokeObjectURL(audioCache.current.url);
+      }
+      audioCache.current = {
+        bpm,
+        volume,
+        blob,
+        url
+      };
       currentBlobUrl.current = url;
 
       // Load and play the audio
       processedAudioRef.current.src = url;
       processedAudioRef.current.load();
-      
-      await new Promise((resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-          cleanup();
-          reject(new Error('Audio load timeout'));
-        }, 5000);
 
-        const handleCanPlay = () => {
-          cleanup();
-          resolve(undefined);
-        };
+      try {
+        await processedAudioRef.current.play();
+        setIsPlayingProcessed(true);
+        setIsLoading(false);  // Clear loading state after successful play
+      } catch (playError) {
+        console.error('Error playing audio:', playError);
+        throw new Error('Failed to play audio');
+      }
 
-        const handleError = () => {
-          cleanup();
-          reject(new Error('Failed to load audio'));
-        };
-
-        const cleanup = () => {
-          clearTimeout(timeoutId);
-          processedAudioRef.current?.removeEventListener('canplaythrough', handleCanPlay);
-          processedAudioRef.current?.removeEventListener('error', handleError);
-        };
-
-        processedAudioRef.current?.addEventListener('canplaythrough', handleCanPlay);
-        processedAudioRef.current?.addEventListener('error', handleError);
-      });
-
-      await processedAudioRef.current.play();
-      setIsPlayingProcessed(true);
     } catch (err) {
-      console.error('Error playing processed audio:', err);
+      console.error('Error processing audio:', err);
       setError(err instanceof Error ? err.message : 'Failed to play audio');
       setIsPlayingProcessed(false);
-    } finally {
-      setIsLoading(false);
+      setIsLoading(false);  // Make sure to clear loading state on error
     }
   };
 
@@ -116,12 +161,47 @@ export default function AudioControls({ fileId }: AudioControlsProps) {
     }
   };
 
-  // Clean up blob URL when component unmounts
-  React.useEffect(() => {
-    return () => {
-      if (currentBlobUrl.current) {
-        URL.revokeObjectURL(currentBlobUrl.current);
+  const handleDownload = async () => {
+    try {
+      setIsDownloading(true);
+      setError(null);
+
+      const response = await fetch(
+        `${API_URL}/process/raw?file_id=${fileId}&bpm=${bpm}&volume=${volume}`,
+        { method: 'POST' }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to process raw file');
       }
+
+      // Get the filename from the Content-Disposition header
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+      const filename = filenameMatch ? filenameMatch[1] : `processed_${fileId}.mp3`;
+
+      // Create a download link
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error downloading processed file:', err);
+      setError(err instanceof Error ? err.message : 'Failed to download file');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  // Clean up blob URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      clearCache();
     };
   }, []);
 
@@ -190,6 +270,32 @@ export default function AudioControls({ fileId }: AudioControlsProps) {
                   Play with BPM
                 </>
               )}
+            </span>
+          )}
+        </button>
+
+        <button
+          onClick={handleDownload}
+          disabled={isDownloading}
+          className={`flex items-center justify-center px-4 py-2 rounded-full text-white font-medium transition-colors
+            ${isDownloading ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-500 hover:bg-purple-600'}
+          `}
+          title="Download the full audio with metronome"
+        >
+          {isDownloading ? (
+            <div className="flex items-center">
+              <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Processing...
+            </div>
+          ) : (
+            <span className="flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+              Download Processed
             </span>
           )}
         </button>
