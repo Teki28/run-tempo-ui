@@ -2,15 +2,14 @@
 
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import axios from 'axios';
+import { useApiClient } from '@/lib/api-client';
 import AudioControls from './AudioControls';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 interface UploadResponse {
   id: string;
-  message: string;
+  message?: string;
 }
 
 interface AudioUploaderProps {
@@ -24,6 +23,8 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadResponse | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  const { uploadFile, uploadSample } = useApiClient();
 
   const handleNewUpload = async (result: UploadResponse) => {
     // Start transition
@@ -47,8 +48,12 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
     setIsUploading(true);
 
     try {
-      const response = await axios.post<UploadResponse>(`${API_URL}/upload/sample`);
-      await handleNewUpload(response.data);
+      setUploadProgress(50); // Simulate progress
+      
+      const response = await uploadSample();
+      setUploadProgress(100);
+      
+      await handleNewUpload(response);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load sample music';
       setError(errorMessage);
@@ -88,24 +93,14 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
       setIsUploading(true);
-      const response = await axios.post<UploadResponse>(`${API_URL}/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        onUploadProgress: (progressEvent) => {
-          const progress = progressEvent.total
-            ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
-            : 0;
-          setUploadProgress(progress);
-        },
-      });
-
-      await handleNewUpload(response.data);
+      setUploadProgress(50); // Simulate progress since we can't track it with the new API
+      
+      const response = await uploadFile(file);
+      setUploadProgress(100);
+      
+      await handleNewUpload(response);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Upload failed';
       setError(errorMessage);
@@ -113,7 +108,7 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
     } finally {
       setIsUploading(false);
     }
-  }, [handleNewUpload, onUploadError]);
+  }, [uploadFile, handleNewUpload, onUploadError]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -177,7 +172,9 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
       {uploadResult && (
         <div className="mt-4 space-y-4">
           <div className="p-4 bg-gray-50 rounded-lg space-y-2 border border-gray-200">
-            <div className="text-green-700 font-medium">{uploadResult.message}</div>
+            <div className="text-green-700 font-medium">
+              {uploadResult.message || 'Upload successful!'}
+            </div>
             <div className="text-sm space-y-2">
               <div className="p-2 bg-white rounded border border-gray-200">
                 <span className="font-medium text-gray-700">File ID: </span>

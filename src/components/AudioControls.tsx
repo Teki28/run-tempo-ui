@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useApiClient } from '@/lib/api-client';
 import BpmControls from './BpmControls';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+// Add this line to define API_URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface AudioControlsProps {
   fileId: string;
@@ -26,15 +28,11 @@ export default function AudioControls({ fileId, onNewFile }: AudioControlsProps)
   const [bpm, setBpm] = useState(120);
   const [volume, setVolume] = useState(100);  // Default to 100% (normal volume)
   
-  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
-  const processedAudioRef = useRef<HTMLAudioElement | null>(null);
+  const previewAudioRef = useRef<HTMLAudioElement>(null);
+  const processedAudioRef = useRef<HTMLAudioElement>(null);
+  const audioCache = useRef<AudioCache>({ bpm: 0, volume: 0, blob: null, url: null });
   const currentBlobUrl = useRef<string | null>(null);
-  const audioCache = useRef<AudioCache>({
-    bpm: 0,
-    volume: 0,
-    blob: null,
-    url: null
-  });
+  const { processPreview, processRaw } = useApiClient();
 
   // Reset cache when fileId changes (new file uploaded or sample loaded)
   useEffect(() => {
@@ -48,16 +46,11 @@ export default function AudioControls({ fileId, onNewFile }: AudioControlsProps)
     if (audioCache.current.url) {
       URL.revokeObjectURL(audioCache.current.url);
     }
-    audioCache.current = {
-      bpm: 0,
-      volume: 0,
-      blob: null,
-      url: null
-    };
     if (currentBlobUrl.current) {
       URL.revokeObjectURL(currentBlobUrl.current);
-      currentBlobUrl.current = null;
     }
+    audioCache.current = { bpm: 0, volume: 0, blob: null, url: null };
+    currentBlobUrl.current = null;
   };
 
   const handlePreviewPlay = () => {
@@ -65,6 +58,7 @@ export default function AudioControls({ fileId, onNewFile }: AudioControlsProps)
 
     if (isPlayingPreview) {
       previewAudioRef.current.pause();
+      setIsPlayingPreview(false);
     } else {
       previewAudioRef.current.play();
     }
@@ -98,23 +92,14 @@ export default function AudioControls({ fileId, onNewFile }: AudioControlsProps)
         currentBlobUrl.current = null;
       }
 
-      // Get processed audio from backend
-      const response = await fetch(
-        `${API_URL}/process/preview?preview_id=${fileId}&bpm=${bpm}&volume=${volume}`,
-        { method: 'POST' }
-      );
+      // Get processed audio from backend using authenticated API
+      const blob = await processPreview(fileId, bpm, volume);
       
-      if (!response.ok) {
-        throw new Error('Failed to process audio');
-      }
-
-      const arrayBuffer = await response.arrayBuffer();
-      if (arrayBuffer.byteLength === 0) {
+      if (blob.size === 0) {
         throw new Error('Received empty audio data');
       }
 
       // Create new blob URL and cache it
-      const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
       const url = URL.createObjectURL(blob);
       
       // Update cache
@@ -132,7 +117,7 @@ export default function AudioControls({ fileId, onNewFile }: AudioControlsProps)
       // Load and play the audio
       processedAudioRef.current.src = url;
       processedAudioRef.current.load();
-
+      
       try {
         await processedAudioRef.current.play();
         setIsPlayingProcessed(true);
@@ -166,26 +151,14 @@ export default function AudioControls({ fileId, onNewFile }: AudioControlsProps)
       setIsDownloading(true);
       setError(null);
 
-      const response = await fetch(
-        `${API_URL}/process/raw?file_id=${fileId}&bpm=${bpm}&volume=${volume}`,
-        { method: 'POST' }
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to process raw file');
-      }
-
-      // Get the filename from the Content-Disposition header
-      const contentDisposition = response.headers.get('Content-Disposition');
-      const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
-      const filename = filenameMatch ? filenameMatch[1] : `processed_${fileId}.mp3`;
+      // Get processed raw file using authenticated API
+      const blob = await processRaw(fileId, bpm, volume);
 
       // Create a download link
-      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = filename;
+      a.download = `processed_${fileId}.mp3`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
