@@ -10,6 +10,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 interface AudioControlsProps {
   fileId: string;
   onNewFile?: () => void;  // Called when a new file is uploaded or sample is loaded
+  onDownloadSuccess?: () => void;  // Called when download is successful
 }
 
 interface AudioCache {
@@ -19,7 +20,7 @@ interface AudioCache {
   url: string | null;
 }
 
-export default function AudioControls({ fileId, onNewFile }: AudioControlsProps) {
+export default function AudioControls({ fileId, onNewFile, onDownloadSuccess }: AudioControlsProps) {
   const [isPlayingPreview, setIsPlayingPreview] = useState(false);
   const [isPlayingProcessed, setIsPlayingProcessed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -163,6 +164,10 @@ export default function AudioControls({ fileId, onNewFile }: AudioControlsProps)
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
+      if (onDownloadSuccess) {
+        onDownloadSuccess();
+      }
     } catch (err) {
       console.error('Error downloading processed file:', err);
       setError(err instanceof Error ? err.message : 'Failed to download file');

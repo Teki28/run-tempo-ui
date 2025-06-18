@@ -29,7 +29,7 @@ export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
         <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome to Run Tempo
+              Welcome to Run Pulse
             </h1>
             <p className="text-gray-600">
               Please sign in to access the audio processing features.

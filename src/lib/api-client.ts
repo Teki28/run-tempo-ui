@@ -4,19 +4,21 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 // Hook to get API client with authentication
 export function useApiClient() {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-  const getHeaders = async (): Promise<HeadersInit> => {
+  const getHeaders = async (requireAuth: boolean = true): Promise<HeadersInit> => {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
 
-    try {
-      const token = await getAccessTokenSilently();
-      headers['Authorization'] = `Bearer ${token}`;
-    } catch (error) {
-      console.warn('Failed to get access token:', error);
-      // Continue without token for public endpoints
+    if (requireAuth && isAuthenticated) {
+      try {
+        const token = await getAccessTokenSilently();
+        headers['Authorization'] = `Bearer ${token}`;
+      } catch (error) {
+        console.warn('Failed to get access token:', error);
+        // Continue without token for public endpoints
+      }
     }
 
     return headers;
@@ -24,10 +26,11 @@ export function useApiClient() {
 
   const request = async <T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    requireAuth: boolean = true
   ): Promise<T> => {
     const url = `${API_BASE_URL}${endpoint}`;
-    const headers = await getHeaders();
+    const headers = await getHeaders(requireAuth);
 
     const response = await fetch(url, {
       ...options,
@@ -56,7 +59,7 @@ export function useApiClient() {
     return response.text() as T;
   };
 
-  // Audio upload
+  // Audio upload (requires authentication)
   const uploadFile = async (file: File): Promise<{ id: string }> => {
     const formData = new FormData();
     formData.append('file', file);
@@ -78,39 +81,23 @@ export function useApiClient() {
     return response.json();
   };
 
-  // Sample upload
+  // Sample upload (public endpoint)
   const uploadSample = async (): Promise<{ id: string; message: string }> => {
-    const token = await getAccessTokenSilently();
-    
-    const response = await fetch(`${API_BASE_URL}/upload/sample`, {
+    return request('/upload/sample', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Sample upload failed: ${response.statusText}`);
-    }
-
-    return response.json();
+    }, false); // No authentication required
   };
 
-  // Audio processing
+  // Audio processing (public endpoints)
   const processPreview = async (
     previewId: string,
     bpm: number,
     volume: number
   ): Promise<Blob> => {
-    const token = await getAccessTokenSilently();
-    
     const response = await fetch(
       `${API_BASE_URL}/process/preview?preview_id=${previewId}&bpm=${bpm}&volume=${volume}`,
       {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       }
     );
 
@@ -126,15 +113,10 @@ export function useApiClient() {
     bpm: number,
     volume: number
   ): Promise<Blob> => {
-    const token = await getAccessTokenSilently();
-    
     const response = await fetch(
       `${API_BASE_URL}/process/raw?file_id=${fileId}&bpm=${bpm}&volume=${volume}`,
       {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       }
     );
 
@@ -147,27 +129,27 @@ export function useApiClient() {
 
   // BPM calculation (public endpoint)
   const getBpmInfo = async (targetBpm: number): Promise<{ base_bpm: number; speed_factor: number }> => {
-    return request(`/bpm/${targetBpm}`);
+    return request(`/bpm/${targetBpm}`, {}, false);
   };
 
   // Health check (public endpoint)
   const healthCheck = async (): Promise<{ status: string; service: string }> => {
-    return request('/health');
+    return request('/health', {}, false);
   };
 
-  // User endpoints
+  // User endpoints (require authentication)
   const getUserProfile = async (): Promise<any> => {
-    return request('/user/profile');
+    return request('/user/profile', {}, true);
   };
 
   const getUserFiles = async (fileType: string = 'raw'): Promise<any> => {
-    return request(`/user/files?file_type=${fileType}`);
+    return request(`/user/files?file_type=${fileType}`, {}, true);
   };
 
   const deleteUserFile = async (fileId: string): Promise<any> => {
     return request(`/user/files/${fileId}`, {
       method: 'DELETE',
-    });
+    }, true);
   };
 
   return {

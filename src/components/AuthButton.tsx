@@ -1,10 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Button } from './ui/button';
-import { LogIn, LogOut, UserPlus, User } from 'lucide-react';
+import { LogIn, LogOut, UserPlus, User, Coins } from 'lucide-react';
+import { useUserProfile } from '@/contexts/UserProfileContext';
+import { UserProfileModal } from './UserProfileModal';
 
 export function AuthButton() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const { 
     isAuthenticated, 
     loginWithRedirect, 
@@ -12,6 +17,8 @@ export function AuthButton() {
     user, 
     isLoading 
   } = useAuth0();
+
+  const { profile, loading: profileLoading } = useUserProfile();
 
   const handleLogin = () => {
     loginWithRedirect({
@@ -33,6 +40,14 @@ export function AuthButton() {
     });
   };
 
+  const handleUserClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   if (isLoading) {
     return (
       <Button disabled className="flex items-center gap-2">
@@ -44,20 +59,41 @@ export function AuthButton() {
 
   if (isAuthenticated && user) {
     return (
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 text-sm">
-          <User className="w-4 h-4" />
-          <span className="hidden sm:inline">{user.name || user.email}</span>
+      <>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 text-sm">
+            <User className="w-4 h-4" />
+            <button
+              onClick={handleUserClick}
+              className="hidden sm:inline hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              {user.name || user.email}
+            </button>
+            {profile && (
+              <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
+                <Coins className="w-3 h-3" />
+                <span>{profile.balance}</span>
+                {profileLoading && (
+                  <div className="w-3 h-3 border border-yellow-600 border-t-transparent rounded-full animate-spin"></div>
+                )}
+              </div>
+            )}
+          </div>
+          <Button 
+            onClick={handleLogout}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
         </div>
-        <Button 
-          onClick={handleLogout}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <LogOut className="w-4 h-4" />
-          Logout
-        </Button>
-      </div>
+        
+        <UserProfileModal 
+          isOpen={isModalOpen} 
+          onClose={handleCloseModal} 
+        />
+      </>
     );
   }
 
