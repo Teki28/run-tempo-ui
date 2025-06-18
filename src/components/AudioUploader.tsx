@@ -39,7 +39,7 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
     setShowCreditModal(true);
   };
 
-  const handleNewUpload = async (result: UploadResponse) => {
+  const handleNewUpload = useCallback(async (result: UploadResponse) => {
     // Start transition
     setIsTransitioning(true);
     
@@ -61,7 +61,7 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
     
     // End transition after a small delay to allow for fade in
     setTimeout(() => setIsTransitioning(false), 50);
-  };
+  }, [onUploadComplete, isAuthenticated, refreshProfile]);
 
   const handleDownloadSuccess = () => {
     // Clear the upload result to force user to re-upload

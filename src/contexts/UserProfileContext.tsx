@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { userProfileService, UserProfile } from '@/lib/userProfileService';
 
@@ -24,7 +24,7 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!isAuthenticated) return;
     
     setLoading(true);
@@ -39,7 +39,7 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated, getAccessTokenSilently]);
 
   const refreshProfile = async () => {
     await fetchProfile();
@@ -53,7 +53,7 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
       setProfile(null);
       setError(null);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchProfile]);
 
   const value = {
     profile,

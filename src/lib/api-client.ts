@@ -2,6 +2,25 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+interface UserProfile {
+  user_id: string;
+  email?: string;
+  balance: number;
+}
+
+interface UserFile {
+  id: string;
+  filename: string;
+  file_type: string;
+  created_at: string;
+  size_bytes?: number;
+}
+
+interface UserFilesResponse {
+  files: UserFile[];
+  total: number;
+}
+
 // Hook to get API client with authentication
 export function useApiClient() {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
@@ -138,15 +157,15 @@ export function useApiClient() {
   };
 
   // User endpoints (require authentication)
-  const getUserProfile = async (): Promise<any> => {
+  const getUserProfile = async (): Promise<UserProfile> => {
     return request('/user/profile', {}, true);
   };
 
-  const getUserFiles = async (fileType: string = 'raw'): Promise<any> => {
+  const getUserFiles = async (fileType: string = 'raw'): Promise<UserFilesResponse> => {
     return request(`/user/files?file_type=${fileType}`, {}, true);
   };
 
-  const deleteUserFile = async (fileId: string): Promise<any> => {
+  const deleteUserFile = async (fileId: string): Promise<{ success: boolean; message: string }> => {
     return request(`/user/files/${fileId}`, {
       method: 'DELETE',
     }, true);

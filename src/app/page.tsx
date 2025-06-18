@@ -77,7 +77,7 @@ export default function Home() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">Perfect Running Tempo</h3>
-                      <p className="text-gray-600">Upload your favorite music and we'll add a metronome that matches your target running pace.</p>
+                      <p className="text-gray-600">Upload your favorite music and we&apos;ll add a metronome that matches your target running pace.</p>
                     </div>
                   </div>
 

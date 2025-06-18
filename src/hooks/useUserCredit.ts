@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { userCreditService, UserCreditResponse } from '@/lib/userCreditService';
+import { userCreditService } from '@/lib/userCreditService';
 
 export function useUserCredit() {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
@@ -8,7 +8,7 @@ export function useUserCredit() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCredit = async () => {
+  const fetchCredit = useCallback(async () => {
     if (!isAuthenticated) return;
     
     setLoading(true);
@@ -23,7 +23,7 @@ export function useUserCredit() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated, getAccessTokenSilently]);
 
   const updateCredit = async (newCredit: number) => {
     if (!isAuthenticated) return;
@@ -90,7 +90,7 @@ export function useUserCredit() {
       setCredit(null);
       setError(null);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchCredit]);
 
   return {
     credit,
