@@ -100,8 +100,33 @@ export function useApiClient() {
     return response.json();
   };
 
+  // Multiple audio upload (requires authentication)
+  const uploadFiles = async (files: File[]): Promise<{ preview_id: string; file_ids: string[] }> => {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('files', file);
+    });
+
+    const token = await getAccessTokenSilently();
+    
+    const response = await fetch(`${API_BASE_URL}/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: response.statusText }));
+        throw new Error(`Upload failed: ${errorData.detail}`);
+    }
+
+    return response.json();
+  };
+
   // Sample upload (public endpoint)
-  const uploadSample = async (): Promise<{ id: string; message: string }> => {
+  const uploadSample = async (): Promise<{ preview_id: string; file_ids: string[] }> => {
     return request('/upload/sample', {
       method: 'POST',
     }, false); // No authentication required
@@ -130,19 +155,26 @@ export function useApiClient() {
   const processRaw = async (
     fileId: string,
     bpm: number,
-    volume: number
+    volume: number,
+    fileCount: number = 1,
+    mergeToOneOrNot: boolean = false
   ): Promise<Blob> => {
+    const params = new URLSearchParams({
+      file_id: fileId,
+      total_file_numbers: fileCount.toString(),
+      mergeToOneOrNot: mergeToOneOrNot ? 'true' : 'false',
+      bpm: bpm.toString(),
+      volume: volume.toString()
+    });
     const response = await fetch(
-      `${API_BASE_URL}/process/raw?file_id=${fileId}&bpm=${bpm}&volume=${volume}`,
+      `${API_BASE_URL}/process/raw?${params.toString()}`,
       {
         method: 'POST',
       }
     );
-
     if (!response.ok) {
       throw new Error(`Processing failed: ${response.statusText}`);
     }
-
     return response.blob();
   };
 
@@ -174,6 +206,7 @@ export function useApiClient() {
   return {
     request,
     uploadFile,
+    uploadFiles,
     uploadSample,
     processPreview,
     processRaw,

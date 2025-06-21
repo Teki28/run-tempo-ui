@@ -5,8 +5,9 @@ import AudioUploader from '../components/AudioUploader';
 import { AuthButton } from '../components/AuthButton';
 
 interface UploadResponse {
-  id: string;
+  preview_id: string; // This will be the preview_id
   message?: string;
+  file_ids?: string[];
 }
 
 export default function Home() {

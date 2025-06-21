@@ -9,6 +9,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface AudioControlsProps {
   fileId: string;
+  fileCount?: number;
   onNewFile?: () => void;  // Called when a new file is uploaded or sample is loaded
   onDownloadSuccess?: () => void;  // Called when download is successful
 }
@@ -20,7 +21,7 @@ interface AudioCache {
   url: string | null;
 }
 
-export default function AudioControls({ fileId, onNewFile, onDownloadSuccess }: AudioControlsProps) {
+export default function AudioControls({ fileId, fileCount = 1, onNewFile, onDownloadSuccess }: AudioControlsProps) {
   const [isPlayingPreview, setIsPlayingPreview] = useState(false);
   const [isPlayingProcessed, setIsPlayingProcessed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -147,30 +148,22 @@ export default function AudioControls({ fileId, onNewFile, onDownloadSuccess }: 
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownload = async (mergeToOne: boolean) => {
+    setIsDownloading(true);
+    setError(null);
     try {
-      setIsDownloading(true);
-      setError(null);
-
-      // Get processed raw file using authenticated API
-      const blob = await processRaw(fileId, bpm, volume);
-
-      // Create a download link
-      const url = URL.createObjectURL(blob);
+      const blob = await processRaw(fileId, bpm, volume, fileCount, mergeToOne);
+      const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `processed_${fileId}.mp3`;
+      a.download = mergeToOne ? `merged_${fileId}.mp3` : `processed_${fileId}.zip`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      if (onDownloadSuccess) {
-        onDownloadSuccess();
-      }
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      if (onDownloadSuccess) onDownloadSuccess();
     } catch (err) {
-      console.error('Error downloading processed file:', err);
-      setError(err instanceof Error ? err.message : 'Failed to download file');
+      setError('Download failed.' + err);
     } finally {
       setIsDownloading(false);
     }
@@ -252,30 +245,20 @@ export default function AudioControls({ fileId, onNewFile, onDownloadSuccess }: 
           )}
         </button>
 
+        {/* Download and Merge Buttons */}
         <button
-          onClick={handleDownload}
+          onClick={() => handleDownload(false)}
           disabled={isDownloading}
-          className={`flex items-center justify-center px-4 py-2 rounded-full text-white font-medium transition-colors
-            ${isDownloading ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-500 hover:bg-purple-600'}
-          `}
-          title="Download the full audio with metronome"
+          className="flex items-center justify-center px-4 py-2 rounded-full text-white font-medium bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50"
         >
-          {isDownloading ? (
-            <div className="flex items-center">
-              <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Processing...
-            </div>
-          ) : (
-            <span className="flex items-center">
-              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-              Download Processed
-            </span>
-          )}
+          {isDownloading ? 'Downloading...' : `Download (${fileCount} file${fileCount > 1 ? 's' : ''})`}
+        </button>
+        <button
+          onClick={() => handleDownload(true)}
+          disabled={isDownloading}
+          className="flex items-center justify-center px-4 py-2 rounded-full text-white font-medium bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50"
+        >
+          {isDownloading ? 'Merging...' : 'Merge to one and download'}
         </button>
       </div>
 

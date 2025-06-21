@@ -6,9 +6,10 @@ interface CreditCheckModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentBalance: number;
+  requiredCredits: number;
 }
 
-export default function CreditCheckModal({ isOpen, onClose, currentBalance }: CreditCheckModalProps) {
+export default function CreditCheckModal({ isOpen, onClose, currentBalance, requiredCredits }: CreditCheckModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -39,7 +40,7 @@ export default function CreditCheckModal({ isOpen, onClose, currentBalance }: Cr
 
           {/* Message */}
           <p className="text-sm text-gray-600 mb-4">
-            You need at least <span className="font-semibold text-red-600">1 credit</span> to upload a file.
+            You need at least <span className="font-semibold text-red-600">{requiredCredits} credit(s)</span> to upload.
             <br />
             Your current balance: <span className="font-semibold text-gray-900">{currentBalance} credits</span>
           </p>
