@@ -70,10 +70,10 @@ export function useApiClient() {
   };
 
   // Sample upload (public endpoint)
-  const uploadSample = async (): Promise<{ id: string; message: string }> => {
+  const uploadSample = async (): Promise<{ preview_id: string; file_ids: string[] }> => {
     return request('/upload/sample', {
       method: 'POST',
-    });
+    }); // No authentication required
   };
 
   // Audio processing (public endpoints)
