@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import AudioUploader from '../components/AudioUploader';
-import { AuthButton } from '../components/AuthButton';
 
 interface UploadResponse {
   preview_id: string; // This will be the preview_id
@@ -35,7 +34,6 @@ export default function Home() {
               />
               <h1 className="text-xl font-semibold text-gray-900">Run Pulse</h1>
             </div>
-            <AuthButton />
           </div>
         </div>
       </header>
@@ -123,8 +121,8 @@ export default function Home() {
                   <h4 className="font-semibold text-gray-900 mb-2">How to Get Started</h4>
                   <ol className="text-sm text-gray-600 space-y-1">
                     <li>1. <strong>Try Sample Music</strong> - Test the app with our demo track</li>
-                    <li>2. <strong>Sign Up</strong> - Create an account to upload your own music</li>
-                    <li>3. <strong>Upload & Process</strong> - Add your MP3 and adjust BPM/volume</li>
+                    <li>2. <strong>Upload Your Music</strong> - Add your MP3 files (up to 5 at once)</li>
+                    <li>3. <strong>Adjust Settings</strong> - Set your desired BPM and volume</li>
                     <li>4. <strong>Download & Run</strong> - Get your tempo-synced music ready for your workout</li>
                   </ol>
                 </div>

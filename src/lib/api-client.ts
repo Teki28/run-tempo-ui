@@ -1,55 +1,15 @@
-import { useAuth0 } from '@auth0/auth0-react';
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-interface UserProfile {
-  user_id: string;
-  email?: string;
-  balance: number;
-}
-
-interface UserFile {
-  id: string;
-  filename: string;
-  file_type: string;
-  created_at: string;
-  size_bytes?: number;
-}
-
-interface UserFilesResponse {
-  files: UserFile[];
-  total: number;
-}
-
-// Hook to get API client with authentication
+// Hook to get API client
 export function useApiClient() {
-  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
-
-  const getHeaders = async (requireAuth: boolean = true): Promise<HeadersInit> => {
+  const request = async <T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> => {
+    const url = `${API_BASE_URL}${endpoint}`;
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
-
-    if (requireAuth && isAuthenticated) {
-      try {
-        const token = await getAccessTokenSilently();
-        headers['Authorization'] = `Bearer ${token}`;
-      } catch (error) {
-        console.warn('Failed to get access token:', error);
-        // Continue without token for public endpoints
-      }
-    }
-
-    return headers;
-  };
-
-  const request = async <T>(
-    endpoint: string,
-    options: RequestInit = {},
-    requireAuth: boolean = true
-  ): Promise<T> => {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const headers = await getHeaders(requireAuth);
 
     const response = await fetch(url, {
       ...options,
@@ -60,12 +20,6 @@ export function useApiClient() {
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('Authentication required. Please log in.');
-      }
-      if (response.status === 403) {
-        throw new Error('Access forbidden. You may not have permission to access this resource.');
-      }
       throw new Error(`API request failed: ${response.statusText}`);
     }
 
@@ -78,18 +32,13 @@ export function useApiClient() {
     return response.text() as T;
   };
 
-  // Audio upload (requires authentication)
+  // Audio upload (public endpoint)
   const uploadFile = async (file: File): Promise<{ id: string }> => {
     const formData = new FormData();
     formData.append('file', file);
-
-    const token = await getAccessTokenSilently();
     
     const response = await fetch(`${API_BASE_URL}/upload`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
       body: formData,
     });
 
@@ -100,20 +49,15 @@ export function useApiClient() {
     return response.json();
   };
 
-  // Multiple audio upload (requires authentication)
+  // Multiple audio upload (public endpoint)
   const uploadFiles = async (files: File[]): Promise<{ preview_id: string; file_ids: string[] }> => {
     const formData = new FormData();
     files.forEach(file => {
       formData.append('files', file);
     });
-
-    const token = await getAccessTokenSilently();
     
     const response = await fetch(`${API_BASE_URL}/upload`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
       body: formData,
     });
 
@@ -126,10 +70,10 @@ export function useApiClient() {
   };
 
   // Sample upload (public endpoint)
-  const uploadSample = async (): Promise<{ preview_id: string; file_ids: string[] }> => {
+  const uploadSample = async (): Promise<{ id: string; message: string }> => {
     return request('/upload/sample', {
       method: 'POST',
-    }, false); // No authentication required
+    });
   };
 
   // Audio processing (public endpoints)
@@ -180,27 +124,12 @@ export function useApiClient() {
 
   // BPM calculation (public endpoint)
   const getBpmInfo = async (targetBpm: number): Promise<{ base_bpm: number; speed_factor: number }> => {
-    return request(`/bpm/${targetBpm}`, {}, false);
+    return request(`/bpm/${targetBpm}`);
   };
 
   // Health check (public endpoint)
   const healthCheck = async (): Promise<{ status: string; service: string }> => {
-    return request('/health', {}, false);
-  };
-
-  // User endpoints (require authentication)
-  const getUserProfile = async (): Promise<UserProfile> => {
-    return request('/user/profile', {}, true);
-  };
-
-  const getUserFiles = async (fileType: string = 'raw'): Promise<UserFilesResponse> => {
-    return request(`/user/files?file_type=${fileType}`, {}, true);
-  };
-
-  const deleteUserFile = async (fileId: string): Promise<{ success: boolean; message: string }> => {
-    return request(`/user/files/${fileId}`, {
-      method: 'DELETE',
-    }, true);
+    return request('/health');
   };
 
   return {
@@ -212,8 +141,5 @@ export function useApiClient() {
     processRaw,
     getBpmInfo,
     healthCheck,
-    getUserProfile,
-    getUserFiles,
-    deleteUserFile,
   };
 } 

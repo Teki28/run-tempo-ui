@@ -2,12 +2,8 @@
 
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useAuth0 } from '@auth0/auth0-react';
 import { useApiClient } from '@/lib/api-client';
-import { useCreditCheck } from '@/hooks/useCreditCheck';
-import { useUserProfile } from '@/contexts/UserProfileContext';
 import AudioControls from './AudioControls';
-import CreditCheckModal from './CreditCheckModal';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 const MAX_FILES = parseInt(process.env.NEXT_PUBLIC_MAX_UPLOAD_FILES || '5');
@@ -29,43 +25,17 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadResponse | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [showCreditModal, setShowCreditModal] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   
-  const { isAuthenticated } = useAuth0();
   const { uploadFiles, uploadSample } = useApiClient();
-  const { hasSufficientCredits, getCurrentBalance, isProfileLoaded, profileLoading } = useCreditCheck();
-  const { refreshProfile } = useUserProfile();
-
-  // Show credit modal if insufficient credits
-  const handleInsufficientCredits = () => {
-    setShowCreditModal(true);
-  };
 
   const handleNewUpload = useCallback(async (result: UploadResponse) => {
-    // Start transition
     setIsTransitioning(true);
-    
-    // Set a small delay to allow for fade out
     await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Update the result
     setUploadResult(result);
-    // Store the number of files uploaded (from selectedFiles)
     onUploadComplete?.(result);
-    
-    // Refresh user profile to update credit balance (only if authenticated)
-    if (isAuthenticated) {
-      try {
-        await refreshProfile();
-      } catch (err) {
-        console.error('Failed to refresh user profile after upload:', err);
-      }
-    }
-    
-    // End transition after a small delay to allow for fade in
     setTimeout(() => setIsTransitioning(false), 50);
-  }, [onUploadComplete, isAuthenticated, refreshProfile, selectedFiles.length]);
+  }, [onUploadComplete]);
 
   const handleDownloadSuccess = () => {
     // Clear the upload result to force user to re-upload
@@ -74,12 +44,6 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
   };
 
   const handleSampleMusic = async () => {
-    // For non-authenticated users, allow sample music without credit check
-    if (isAuthenticated && !hasSufficientCredits(1)) {
-      handleInsufficientCredits();
-      return;
-    }
-
     // Reset states
     setError(null);
     setUploadProgress(0);
@@ -102,11 +66,6 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
   };
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    if (!isAuthenticated) {
-      setError('Please log in to upload files');
-      return;
-    }
-
     if (acceptedFiles.length === 0) {
       return;
     }
@@ -114,11 +73,6 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
     if (acceptedFiles.length > MAX_FILES) {
         setError(`You can upload a maximum of ${MAX_FILES} files at once.`);
         return;
-    }
-
-    if (!hasSufficientCredits(acceptedFiles.length)) {
-      handleInsufficientCredits();
-      return;
     }
 
     // Reset states
@@ -155,69 +109,24 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
       setIsUploading(false);
       setSelectedFiles([]);
     }
-  }, [uploadFiles, handleNewUpload, onUploadError, hasSufficientCredits, isAuthenticated]);
+  }, [uploadFiles, handleNewUpload, onUploadError]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
       'audio/mpeg': ['.mp3']
     },
-    disabled: isUploading || (isAuthenticated && profileLoading),
-    noClick: !isAuthenticated
+    disabled: isUploading,
+    noClick: false
   });
-
-  // Show loading state while profile is loading (only for authenticated users)
-  if (isAuthenticated && profileLoading) {
-    return (
-      <div className="w-full max-w-md mx-auto">
-        <div className="p-8 border-2 border-dashed border-gray-300 rounded-lg">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-sm text-gray-600">Loading user profile...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full max-w-md mx-auto">
-      {/* Credit Status Display - Only show for authenticated users */}
-      {isAuthenticated && isProfileLoaded() && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Available Credits:</span>
-            <span className={`font-semibold ${getCurrentBalance() > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {getCurrentBalance()}
-            </span>
-          </div>
-          {getCurrentBalance() === 0 && (
-            <p className="text-xs text-red-600 mt-1">
-              You need at least 1 credit to upload files.
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Login Required Message for Non-Authenticated Users */}
-      {!isAuthenticated && (
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-          <div className="flex items-center gap-2 text-sm text-blue-800">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-            <span>Please log in to upload your own files</span>
-          </div>
-        </div>
-      )}
-
       <div
         {...getRootProps()}
         className={`p-8 border-2 border-dashed rounded-lg transition-colors
           ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}
-          ${isUploading || (isAuthenticated && profileLoading) ? 'cursor-not-allowed opacity-50' : ''}
-          ${!isAuthenticated ? 'cursor-not-allowed opacity-50 bg-gray-50' : 'cursor-pointer hover:border-blue-500'}
-          ${isAuthenticated && getCurrentBalance() === 0 ? 'border-red-300 bg-red-50' : ''}
+          ${isUploading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:border-blue-500'}
         `}
       >
         <input {...getInputProps()} />
@@ -232,25 +141,6 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
                 />
               </div>
               <div className="text-sm text-gray-600">{uploadProgress}%</div>
-            </div>
-          ) : !isAuthenticated ? (
-            <div>
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
-                <svg
-                  className="h-6 w-6 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
-              </div>
-              <p className="text-sm text-gray-600">Please log in to upload</p>
             </div>
           ) : selectedFiles.length > 0 ? (
             <div>
@@ -297,17 +187,13 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
       
       <div className="mt-4 flex justify-center">
         <button
-          onClick={!isAuthenticated ? handleSampleMusic : (hasSufficientCredits(1) ? handleSampleMusic : handleInsufficientCredits)}
-          disabled={isUploading || (isAuthenticated && profileLoading)}
+          onClick={handleSampleMusic}
+          disabled={isUploading}
           className={`px-4 py-2 text-sm font-medium text-white rounded-full transition-colors
-            ${isUploading || (isAuthenticated && profileLoading) ? 'bg-gray-400 cursor-not-allowed' : 
-              !isAuthenticated ? 'bg-purple-500 hover:bg-purple-600' :
-              hasSufficientCredits(1) ? 'bg-purple-500 hover:bg-purple-600' : 'bg-red-500 hover:bg-red-600'}
+            ${isUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-500 hover:bg-purple-600'}
           `}
         >
-          {isUploading ? 'Loading...' : 
-           !isAuthenticated ? 'Try Sample Music' :
-           !hasSufficientCredits(1) ? 'Get More Credits' : 'Try with Sample Music'}
+          {isUploading ? 'Loading...' : 'Try Sample Music'}
         </button>
       </div>
       
@@ -335,14 +221,6 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
           {error}
         </div>
       )}
-
-      {/* Credit Check Modal */}
-      <CreditCheckModal
-        isOpen={showCreditModal}
-        onClose={() => setShowCreditModal(false)}
-        currentBalance={getCurrentBalance()}
-        requiredCredits={selectedFiles.length > 1 ? selectedFiles.length : 1}
-      />
     </div>
   );
 }
