@@ -4,8 +4,11 @@ import React, { useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
+import content from "../content.json";
 
+type ValidLang = "en" | "zh" | "ja";
 interface BpmControlsProps {
+  lang: ValidLang;
   onBpmChange: (bpm: number) => void;
   onVolumeChange: (volume: number) => void;
   defaultBpm?: number;
@@ -13,6 +16,7 @@ interface BpmControlsProps {
 }
 
 export default function BpmControls({
+  lang,
   onBpmChange,
   onVolumeChange,
   defaultBpm = 120,
@@ -58,7 +62,7 @@ export default function BpmControls({
 
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <Label htmlFor="volume-slider">Volume</Label>
+            <Label htmlFor="volume-slider">{content[lang].main.bpmControls.volume}</Label>
             <span className="text-sm font-medium">{volume}%</span>
           </div>
           <Slider
@@ -73,11 +77,6 @@ export default function BpmControls({
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>0%</span>
             <span>500%</span>
-          </div>
-          <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>Mute</span>
-            <span>Normal</span>
-            <span>Amplified</span>
           </div>
         </div>
       </div>

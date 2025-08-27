@@ -1,8 +1,9 @@
-'use client';
+'use client'
 
 import Image from 'next/image';
-import AudioUploader from '../components/AudioUploader';
-import content from "../content.json";
+import AudioUploader from '../../components/AudioUploader';
+import { usePathname } from 'next/navigation';
+import content from "../../content.json";
 
 interface UploadResponse {
   preview_id: string; // This will be the preview_id
@@ -11,6 +12,8 @@ interface UploadResponse {
 }
 
 export default function Home() {
+  type Validcontent = "en" | "zh" | "ja";
+  const pathname = (usePathname()?.slice(1) || "en") as Validcontent;
   const handleUploadComplete = (response: UploadResponse) => {
     console.log('Upload completed:', response);
   };
@@ -33,7 +36,7 @@ export default function Home() {
                 height={40}
                 className="rounded-lg"
               />
-              <h1 className="text-xl font-semibold text-gray-900">{content["en"].header.title}</h1>
+              <h1 className="text-xl font-semibold text-gray-900">{content[pathname].header.title}</h1>
             </div>
           </div>
         </div>
@@ -45,9 +48,9 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Side - App Functionality */}
             <div className="bg-white shadow-sm rounded-lg p-6">
-              <h2 className="text-2xl font-bold mb-6 text-gray-900">{content["en"].main.createMixTitle}</h2>
-              <AudioUploader
-                lang="en"
+              <h2 className="text-2xl font-bold mb-6 text-gray-900">{content[pathname].main.createMixTitle}</h2>
+              <AudioUploader 
+                lang={pathname}
                 onUploadComplete={handleUploadComplete}
                 onUploadError={handleUploadError}
               />
@@ -64,8 +67,8 @@ export default function Home() {
                     height={120}
                     className="rounded-xl mx-auto mb-4"
                   />
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">{content["en"].main.welcomeTitle}</h2>
-                  <p className="text-lg text-gray-600">{content["en"].main.welcomeSubtitle}</p>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">{content[pathname].main.welcomeTitle}</h2>
+                  <p className="text-lg text-gray-600">{content[pathname].main.welcomeSubtitle}</p>
                 </div>
 
                 <div className="space-y-4">
@@ -76,8 +79,8 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{content["en"].main.features.perfectTempo.title}</h3>
-                      <p className="text-gray-600">{content["en"].main.features.perfectTempo.description}</p>
+                      <h3 className="font-semibold text-gray-900">{content[pathname].main.features.perfectTempo.title}</h3>
+                      <p className="text-gray-600">{content[pathname].main.features.perfectTempo.description}</p>
                     </div>
                   </div>
 
@@ -88,8 +91,8 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{content["en"].main.features.customBPM.title}</h3>
-                      <p className="text-gray-600">{content["en"].main.features.customBPM.description}</p>
+                      <h3 className="font-semibold text-gray-900">{content[pathname].main.features.customBPM.title}</h3>
+                      <p className="text-gray-600">{content[pathname].main.features.customBPM.description}</p>
                     </div>
                   </div>
 
@@ -100,8 +103,8 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{content["en"].main.features.volumeControl.title}</h3>
-                      <p className="text-gray-600">{content["en"].main.features.volumeControl.description}</p>
+                      <h3 className="font-semibold text-gray-900">{content[pathname].main.features.volumeControl.title}</h3>
+                      <p className="text-gray-600">{content[pathname].main.features.volumeControl.description}</p>
                     </div>
                   </div>
 
@@ -112,16 +115,16 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{content["en"].main.features.instantDownload.title}</h3>
-                      <p className="text-gray-600">{content["en"].main.features.instantDownload.description}</p>
+                      <h3 className="font-semibold text-gray-900">{content[pathname].main.features.instantDownload.title}</h3>
+                      <p className="text-gray-600">{content[pathname].main.features.instantDownload.description}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
-                  <h4 className="font-semibold text-gray-900 mb-2">{content["en"].main.howToGetStarted.title}</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">{content[pathname]?.main?.howToGetStarted?.title}</h4>
                   <ol className="text-sm text-gray-600 space-y-1">
-                    {content["en"].main.howToGetStarted.steps.map((step, index) => (
+                    {content[pathname].main.howToGetStarted.steps.map((step, index) => (
                       <li key={index}>{index + 1}. {step}</li>
                     ))}
                   </ol>
@@ -129,7 +132,7 @@ export default function Home() {
 
                 <div className="text-center pt-4">
                   <p className="text-sm text-gray-500">
-                    {content["en"].footer}
+                    {content[pathname].footer}
                   </p>
                 </div>
               </div>

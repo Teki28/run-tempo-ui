@@ -3,11 +3,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApiClient } from '@/lib/api-client';
 import BpmControls from './BpmControls';
+import content from "../content.json";
 
 // Add this line to define API_URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
+type ValidLang = "en" | "zh" | "ja";
 interface AudioControlsProps {
+  lang: ValidLang;
   fileId: string;
   fileCount?: number;
   onNewFile?: () => void;  // Called when a new file is uploaded or sample is loaded
@@ -21,7 +23,7 @@ interface AudioCache {
   url: string | null;
 }
 
-export default function AudioControls({ fileId, fileCount = 1, onNewFile, onDownloadSuccess }: AudioControlsProps) {
+export default function AudioControls({ lang, fileId, fileCount = 1, onNewFile, onDownloadSuccess }: AudioControlsProps) {
   const [isPlayingPreview, setIsPlayingPreview] = useState(false);
   const [isPlayingProcessed, setIsPlayingProcessed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -179,9 +181,10 @@ export default function AudioControls({ fileId, fileCount = 1, onNewFile, onDown
   return (
     <div className="space-y-6">
       <div className="text-xs text-gray-500 mb-2">
-        Tip: You can amplify the metronome volume up to 500% if needed
+        {content[lang].main.audioControls.tip}
       </div>
       <BpmControls
+        lang={lang}
         onBpmChange={setBpm}
         onVolumeChange={setVolume}
         defaultBpm={bpm}
@@ -199,14 +202,14 @@ export default function AudioControls({ fileId, fileCount = 1, onNewFile, onDown
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
-                Pause Preview
+                {content[lang].main.audioControls.pausePreview}
               </>
             ) : (
               <>
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                 </svg>
-                Play Preview
+                {content[lang].main.audioControls.playPreview}
               </>
             )}
           </span>
@@ -231,14 +234,14 @@ export default function AudioControls({ fileId, fileCount = 1, onNewFile, onDown
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
-                  Pause Processed
+                  {content[lang].main.audioControls.pauseProcessed}
                 </>
               ) : (
                 <>
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                   </svg>
-                  Play with BPM
+                  {content[lang].main.audioControls.playProcessed}
                 </>
               )}
             </span>
@@ -251,14 +254,14 @@ export default function AudioControls({ fileId, fileCount = 1, onNewFile, onDown
           disabled={isDownloading}
           className="flex items-center justify-center px-4 py-2 rounded-full text-white font-medium bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50"
         >
-          {isDownloading ? 'Downloading...' : `Download (${fileCount} file${fileCount > 1 ? 's' : ''})`}
+          {isDownloading ? content[lang].main.audioControls.downloading : `${content[lang].main.audioControls.download} (${fileCount} file${fileCount > 1 ? 's' : ''})`}
         </button>
         <button
           onClick={() => handleDownload(true)}
           disabled={isDownloading}
           className="flex items-center justify-center px-4 py-2 rounded-full text-white font-medium bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50"
         >
-          {isDownloading ? 'Merging...' : 'Merge to one and download'}
+          {isDownloading ? content[lang].main.audioControls.Merging : content[lang].main.audioControls.MergeToOneAndDownload}
         </button>
       </div>
 

@@ -1,0 +1,188 @@
+{
+  "en": {
+    "header": {
+      "title": "Run Pulse"
+    },
+    "main": {
+      "createMixTitle": "Create Your Running Mix",
+      "welcomeTitle": "Welcome to Run Pulse",
+      "welcomeSubtitle": "Transform your music to match your running pace",
+      "audioUploader": {
+        "dragAndDropInactive": "Drag and drop your audio files here, or click to select files (up to 5 files each time)",
+        "dragAndDropActive": "Drop your files here ...",
+        "dragAndDropSize": "File size limit: 10MB per file",
+        "upload": "Upload",
+        "uploading": "Uploading...",
+        "loading": "Loading...",
+        "TrySampleMusic": "Try Sample Music",
+        "uploadSuccess": "Upload successful!"
+      },
+      "audioControls": {
+        "tip": "Tip: You can amplify the metronome volume up to 500% if needed",
+        "pausePreview": "Pause Preview",
+        "playPreview": "Play Preview",
+        "pauseProcessed": "Pause Processed",
+        "playProcessed": "Play With BPM",
+        "downloading": "Downloading...",
+        "download": "Download",
+        "Merging": "Merging...",
+        "MergeToOneAndDownload": "Merge to One and Download"
+      },
+      "bpmControls": {
+        "volume": "Volume"
+      },
+      "features": {
+        "perfectTempo": {
+          "title": "Perfect Running Tempo",
+          "description": "Upload your favorite music and we'll add a metronome that matches your target running pace."
+        },
+        "customBPM": {
+          "title": "Customizable BPM",
+          "description": "Adjust the beats per minute to match your exact running speed and training goals."
+        },
+        "volumeControl": {
+          "title": "Volume Control",
+          "description": "Fine-tune the metronome volume to blend perfectly with your music."
+        },
+        "instantDownload": {
+          "title": "Instant Download",
+          "description": "Get your processed audio file ready for your next run in seconds."
+        }
+      },
+      "howToGetStarted": {
+        "title": "How to Get Started",
+        "steps": [
+          "Try Sample Music - Test the app with our demo track",
+          "Upload Your Music - Add your MP3 files (up to 5 at once)",
+          "Adjust Settings - Set your desired BPM and volume",
+          "Download & Run - Get your tempo-synced music ready for your workout"
+        ]
+      }
+    },
+    "footer": "Perfect for runners, joggers, and anyone who wants to maintain a consistent pace during their workouts."
+  },
+  "zh": {
+    "header": {
+      "title": "律动奔跑"
+    },
+    "main": {
+      "createMixTitle": "创建你的专属跑步歌单",
+      "welcomeTitle": "欢迎来到律动奔跑",
+      "welcomeSubtitle": "让你的音乐与跑步节奏同步",
+      "audioUploader": {
+        "dragAndDropInactive": "在此处拖放音频文件，或点击选择文件（每次最多5个）",
+        "dragAndDropActive": "在此处放置文件...",
+        "dragAndDropSize": "文件大小限制：每个文件10MB",
+        "upload": "上传",
+        "uploading": "正在上传...",
+        "loading": "正在加载...",
+        "TrySampleMusic": "试玩样本音乐",
+        "uploadSuccess": "上传成功！"
+      },
+      "audioControls": {
+        "tip": "提示：如果需要，节拍器音量可放大至500%",
+        "pausePreview": "暂停",
+        "playPreview": "预览原音乐",
+        "pauseProcessed": "暂停",
+        "playProcessed": "预览添加BPM音乐",
+        "downloading": "正在下载...",
+        "download": "下载全部",
+        "Merging": "正在下载...",
+        "MergeToOneAndDownload": "合并为单文件并下载"
+      },
+      "bpmControls": {
+        "volume": "音量"
+      },
+      "features": {
+        "perfectTempo": {
+          "title": "完美的跑步节拍",
+          "description": "上传你喜爱的音乐，我们会为你添加一个匹配你目标跑步节奏的节拍器。"
+        },
+        "customBPM": {
+          "title": "可自定义的 BPM",
+          "description": "调整每分钟节拍数，以匹配你精准的跑步速度和训练目标。"
+        },
+        "volumeControl": {
+          "title": "音量控制",
+          "description": "精细调整节拍器音量，使其与你的音乐完美融合。"
+        },
+        "instantDownload": {
+          "title": "即时下载",
+          "description": "数秒内即可获得处理好的音频文件，为你的下一次跑步做好准备。"
+        }
+      },
+      "howToGetStarted": {
+        "title": "如何开始",
+        "steps": [
+          "试听样本音乐 - 使用我们的演示曲目测试应用",
+          "上传你的音乐 - 添加你的 MP3 文件（一次最多5个）",
+          "调整设置 - 设定你想要的 BPM 和音量",
+          "下载并开跑 - 获得你的节奏同步音乐，为你的锻炼做好准备"
+        ]
+      }
+    },
+    "footer": "非常适合跑步者、慢跑者以及任何希望在锻炼时保持稳定节奏的人。"
+  },
+  "ja": {
+    "header": {
+      "title": "ランパルス"
+    },
+    "main": {
+      "createMixTitle": "ランニングミックスを作成",
+      "welcomeTitle": "ランパルスへようこそ",
+      "welcomeSubtitle": "音楽をランニングのペースに合わせる",
+      "audioUploader": {
+        "dragAndDropInactive": "ここにオーディオファイルをドラッグ＆ドロップ、またはクリックしてファイルを選択（一度に最大5つ）",
+        "dragAndDropActive": "ここにファイルをドロップ...",
+        "dragAndDropSize": "ファイルサイズ制限：1ファイルあたり10MB",
+        "upload": "アップロード",
+        "uploading": "アップロード中...",
+        "loading": "読み込み中...",
+        "TrySampleMusic": "サンプル音楽で試す",
+        "uploadSuccess": "アップロード成功！"
+      },
+      "audioControls": {
+        "tip": "ヒント：必要に応じてメトロノームの音量を500%まで増幅できます",
+        "pausePreview": "再生中止",
+        "playPreview": "プレビューを再生",
+        "pauseProcessed": "再生中止",
+        "playProcessed": "BPMで再生",
+        "downloading": "ダウンロード中...",
+        "download": "ダウンロード",
+        "Merging": "ダウンロード中...",
+        "MergeToOneAndDownload": "シングルファイルにマージしてダウンロード"
+      },
+      "bpmControls": {
+        "volume": "ボリューム"
+      },
+      "features": {
+        "perfectTempo": {
+          "title": "完璧なランニングテンポ",
+          "description": "お気に入りの音楽をアップロードすると、目標のランニングペースに合わせたメトロノームを追加します。"
+        },
+        "customBPM": {
+          "title": "BPMをカスタマイズ",
+          "description": "BPMを調整して、正確なランニング速度とトレーニング目標に合わせましょう。"
+        },
+        "volumeControl": {
+          "title": "音量調整",
+          "description": "メトロノームの音量を微調整して、音楽と完璧にブレンドさせましょう。"
+        },
+        "instantDownload": {
+          "title": "即時ダウンロード",
+          "description": "処理されたオーディオファイルを数秒で手に入れ、次のランニングに備えましょう。"
+        }
+      },
+      "howToGetStarted": {
+        "title": "始め方",
+        "steps": [
+          "サンプル音楽を試す - デモトラックでアプリをテスト",
+          "音楽をアップロード - MP3ファイルを追加（一度に最大5つまで）",
+          "設定を調整 - 希望のBPMと音量を設定",
+          "ダウンロード＆ラン - テンポ同期された音楽をワークアウトの準備に"
+        ]
+      }
+    },
+    "footer": "ランナー、ジョガー、そしてワークアウト中に一定のペースを維持したいすべての人に最適です。"
+  }
+}

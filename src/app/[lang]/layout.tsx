@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import content from "../content.json";
+import "../globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: content["en"].header.title,
+  title: "Run Pulse",
   description: "Run With YAn app that overlays a customizable BPM tempo track onto your favorite music to match your running pace.",
 };
 

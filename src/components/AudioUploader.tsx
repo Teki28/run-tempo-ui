@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useApiClient } from '@/lib/api-client';
 import AudioControls from './AudioControls';
+import content from "../content.json";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 const MAX_FILES = parseInt(process.env.NEXT_PUBLIC_MAX_UPLOAD_FILES || '5');
@@ -14,12 +15,15 @@ interface UploadResponse {
   file_ids?: string[];
 }
 
+type ValidLang = "en" | "zh" | "ja";
+
 interface AudioUploaderProps {
+  lang: ValidLang;
   onUploadComplete?: (response: UploadResponse) => void;
   onUploadError?: (error: string) => void;
 }
 
-export default function AudioUploader({ onUploadComplete, onUploadError }: AudioUploaderProps) {
+export default function AudioUploader({ lang, onUploadComplete, onUploadError }: AudioUploaderProps) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -133,7 +137,7 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
         <div className="text-center">
           {isUploading ? (
             <div className="space-y-4">
-              <div className="text-sm text-gray-600">Uploading...</div>
+              <div className="text-sm text-gray-600">{content[lang].main.audioUploader.uploading}</div>
               <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div
                   className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
@@ -155,7 +159,7 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
                     }}
                     className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
                 >
-                    Upload
+                    {content[lang].main.audioUploader.upload}
                 </button>
             </div>
           ) : (
@@ -177,9 +181,9 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
                 </svg>
               </div>
               <p className="text-sm text-gray-600">
-                {isDragActive ? 'Drop the files here...' : `Drag & drop up to ${MAX_FILES} MP3 files here, or click to select`}
+                {isDragActive ? content[lang].main.audioUploader.dragAndDropActive : content[lang].main.audioUploader.dragAndDropInactive}
               </p>
-              <p className="text-xs text-gray-500 mt-2">Max 10MB each</p>
+              <p className="text-xs text-gray-500 mt-2">{content[lang].main.audioUploader.dragAndDropSize}</p>
             </div>
           )}
         </div>
@@ -193,7 +197,7 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
             ${isUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-500 hover:bg-purple-600'}
           `}
         >
-          {isUploading ? 'Loading...' : 'Try Sample Music'}
+          {isUploading ? content[lang].main.audioUploader.loading : content[lang].main.audioUploader.TrySampleMusic}
         </button>
       </div>
       
@@ -201,7 +205,7 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
         <div className="mt-4 space-y-4">
           <div className="p-4 bg-gray-50 rounded-lg space-y-2 border border-gray-200">
             <div className="text-green-700 font-medium">
-              {uploadResult.message || 'Upload successful!'}
+              {uploadResult.message || content[lang].main.audioUploader.uploadSuccess}
             </div>
             <div className="text-sm space-y-2">
               <div className="p-2 bg-white rounded border border-gray-200">
@@ -211,7 +215,7 @@ export default function AudioUploader({ onUploadComplete, onUploadError }: Audio
             </div>
           </div>
           <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-            <AudioControls key={uploadResult.preview_id} fileId={uploadResult.preview_id} fileCount={uploadResult.file_ids ? uploadResult.file_ids.length : 1} onDownloadSuccess={handleDownloadSuccess} />
+            <AudioControls lang={lang} key={uploadResult.preview_id} fileId={uploadResult.preview_id} fileCount={uploadResult.file_ids ? uploadResult.file_ids.length : 1} onDownloadSuccess={handleDownloadSuccess} />
           </div>
         </div>
       )}
