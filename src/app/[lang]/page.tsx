@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image';
+import Link from 'next/link';
 import AudioUploader from '../../components/AudioUploader';
 import { usePathname } from 'next/navigation';
 import content from "../../content.json";
@@ -37,6 +38,14 @@ export default function Home() {
                 className="rounded-lg"
               />
               <h1 className="text-xl font-semibold text-gray-900">{content[pathname].header.title}</h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link 
+                href={`/${pathname}/blog/`} 
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-md border border-gray-300 transition-colors duration-150"
+              >
+                {pathname === 'en' ? 'Tutorial' : pathname === 'zh' ? '教程' : 'チュートリアル'}
+              </Link>
             </div>
           </div>
         </div>

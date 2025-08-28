@@ -1,0 +1,13 @@
+{
+  "posts": [
+    {
+      "id": "1",
+      "title": "Getting Started with Run Tempo",
+      "slug": "getting-started",
+      "content": "# Getting Started with Run Tempo\n\nWelcome to Run Tempo! This guide will help you get started with our application and make the most of your running experience.\n\n## What is Run Tempo?\n\nRun Tempo is an innovative application that helps runners maintain their perfect pace by adjusting music to match their target running tempo. Whether you're training for a marathon or just enjoying a casual jog, having the right rhythm can make all the difference.\n\n### Key Features\n\n1. **Custom BPM Adjustment**\n   - Upload your favorite songs\n   - Set your target running pace\n   - Let our AI adjust the tempo\n\n2. **Smart Volume Control**\n   - Fine-tune the metronome volume\n   - Perfect blend with your music\n\n## How to Use Run Tempo\n\n1. **Upload Your Music**\n   ```\n   - Select your favorite running tracks\n   - Supported formats: MP3, WAV\n   - Upload up to 5 files at once\n   ```\n\n2. **Set Your Pace**\n   > Finding your ideal running tempo is crucial. Most runners prefer a cadence between 160-180 BPM.\n\n### Tips for Best Results\n\n* Start with our sample tracks to get familiar with the system\n* Experiment with different BPM settings\n* Save your favorite settings for quick access\n\n---\n\n**Ready to get started?** Head over to our upload section and transform your first track!",
+      "publishedAt": "2025-08-28",
+      "author": "Run Tempo Team",
+      "tags": ["guide", "tutorial"]
+    }
+  ]
+}
