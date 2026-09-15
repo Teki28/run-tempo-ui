@@ -27,6 +27,10 @@ export const onRequest = async (context: Context): Promise<Response> => {
   }
 
   const locale = pickLocale(context.request.headers.get('Accept-Language'));
-  url.pathname = pathname === '/' ? `/${locale}` : `/${locale}${pathname}`;
+  const target = pathname === '/' ? `/${locale}/` : `/${locale}${pathname}`;
+  // next.config.mjs sets trailingSlash: true, so a target without the slash
+  // would be 308'd to the canonical form — two redirects on a visitor's very
+  // first request. Emit the canonical path directly instead.
+  url.pathname = target.endsWith('/') ? target : `${target}/`;
   return Response.redirect(url.toString(), 302);
 };
