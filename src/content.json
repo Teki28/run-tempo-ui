@@ -10,12 +10,11 @@
       "audioUploader": {
         "dragAndDropInactive": "Drag and drop your audio files here, or click to select files (up to 5 files each time)",
         "dragAndDropActive": "Drop your files here ...",
-        "dragAndDropSize": "File size limit: 10MB per file",
-        "upload": "Upload",
-        "uploading": "Uploading...",
+        "dragAndDropSize": "File size limit: 50MB per file · MP3, WAV or M4A",
+        "uploading": "Preparing...",
         "loading": "Loading...",
         "TrySampleMusic": "Try Sample Music",
-        "uploadSuccess": "Upload successful!"
+        "uploadSuccess": "Ready! Your files stayed on your device."
       },
       "audioControls": {
         "tip": "Tip: You can amplify the metronome volume up to 500% if needed",
@@ -26,10 +25,12 @@
         "downloading": "Downloading...",
         "download": "Download",
         "Merging": "Merging...",
-        "MergeToOneAndDownload": "Merge to One and Download"
+        "MergeToOneAndDownload": "Merge to One and Download",
+        "processing": "Processing"
       },
       "bpmControls": {
-        "volume": "Volume"
+        "volume": "Volume",
+        "pauseToAdjust": "Paused playback is required to adjust BPM or volume."
       },
       "features": {
         "perfectTempo": {
@@ -45,15 +46,15 @@
           "description": "Fine-tune the metronome volume to blend perfectly with your music."
         },
         "instantDownload": {
-          "title": "Instant Download",
-          "description": "Get your processed audio file ready for your next run in seconds."
+          "title": "Private & Instant",
+          "description": "Everything runs in your browser — your music never leaves your device."
         }
       },
       "howToGetStarted": {
         "title": "How to Get Started",
         "steps": [
           "Try Sample Music - Test the app with our demo track",
-          "Upload Your Music - Add your MP3 files (up to 5 at once)",
+          "Upload Your Music - Add your MP3, WAV or M4A files (up to 5 at once)",
           "Adjust Settings - Set your desired BPM and volume",
           "Download & Run - Get your tempo-synced music ready for your workout"
         ]
@@ -72,12 +73,11 @@
       "audioUploader": {
         "dragAndDropInactive": "在此处拖放音频文件，或点击选择文件（每次最多5个）",
         "dragAndDropActive": "在此处放置文件...",
-        "dragAndDropSize": "文件大小限制：每个文件10MB",
-        "upload": "上传",
-        "uploading": "正在上传...",
+        "dragAndDropSize": "文件大小限制：每个文件50MB · 支持 MP3、WAV、M4A",
+        "uploading": "正在准备...",
         "loading": "正在加载...",
         "TrySampleMusic": "试玩样本音乐",
-        "uploadSuccess": "上传成功！"
+        "uploadSuccess": "已就绪！文件全程保存在你的设备上。"
       },
       "audioControls": {
         "tip": "提示：如果需要，节拍器音量可放大至500%",
@@ -88,10 +88,12 @@
         "downloading": "正在下载...",
         "download": "下载全部",
         "Merging": "正在下载...",
-        "MergeToOneAndDownload": "合并为单文件并下载"
+        "MergeToOneAndDownload": "合并为单文件并下载",
+        "processing": "处理中"
       },
       "bpmControls": {
-        "volume": "音量"
+        "volume": "音量",
+        "pauseToAdjust": "需要先暂停播放，才能调整 BPM 和音量。"
       },
       "features": {
         "perfectTempo": {
@@ -107,15 +109,15 @@
           "description": "精细调整节拍器音量，使其与你的音乐完美融合。"
         },
         "instantDownload": {
-          "title": "即时下载",
-          "description": "数秒内即可获得处理好的音频文件，为你的下一次跑步做好准备。"
+          "title": "私密且即时",
+          "description": "全部处理都在你的浏览器中完成，音乐不会离开你的设备。"
         }
       },
       "howToGetStarted": {
         "title": "如何开始",
         "steps": [
           "试听样本音乐 - 使用我们的演示曲目测试应用",
-          "上传你的音乐 - 添加你的 MP3 文件（一次最多5个）",
+          "上传你的音乐 - 添加 MP3、WAV 或 M4A 文件（一次最多5个）",
           "调整设置 - 设定你想要的 BPM 和音量",
           "下载并开跑 - 获得你的节奏同步音乐，为你的锻炼做好准备"
         ]
@@ -134,12 +136,11 @@
       "audioUploader": {
         "dragAndDropInactive": "ここにオーディオファイルをドラッグ＆ドロップ、またはクリックしてファイルを選択（一度に最大5つ）",
         "dragAndDropActive": "ここにファイルをドロップ...",
-        "dragAndDropSize": "ファイルサイズ制限：1ファイルあたり10MB",
-        "upload": "アップロード",
-        "uploading": "アップロード中...",
+        "dragAndDropSize": "ファイルサイズ制限：1ファイルあたり50MB · MP3・WAV・M4A対応",
+        "uploading": "準備中...",
         "loading": "読み込み中...",
         "TrySampleMusic": "サンプル音楽で試す",
-        "uploadSuccess": "アップロード成功！"
+        "uploadSuccess": "準備完了！ファイルは端末から送信されていません。"
       },
       "audioControls": {
         "tip": "ヒント：必要に応じてメトロノームの音量を500%まで増幅できます",
@@ -150,10 +151,12 @@
         "downloading": "ダウンロード中...",
         "download": "ダウンロード",
         "Merging": "ダウンロード中...",
-        "MergeToOneAndDownload": "シングルファイルにマージしてダウンロード"
+        "MergeToOneAndDownload": "シングルファイルにマージしてダウンロード",
+        "processing": "処理中"
       },
       "bpmControls": {
-        "volume": "ボリューム"
+        "volume": "ボリューム",
+        "pauseToAdjust": "BPMと音量を調整するには、再生を一時停止してください。"
       },
       "features": {
         "perfectTempo": {
@@ -169,15 +172,15 @@
           "description": "メトロノームの音量を微調整して、音楽と完璧にブレンドさせましょう。"
         },
         "instantDownload": {
-          "title": "即時ダウンロード",
-          "description": "処理されたオーディオファイルを数秒で手に入れ、次のランニングに備えましょう。"
+          "title": "プライベートで高速",
+          "description": "すべてブラウザ内で処理され、音楽が端末外に送信されることはありません。"
         }
       },
       "howToGetStarted": {
         "title": "始め方",
         "steps": [
           "サンプル音楽を試す - デモトラックでアプリをテスト",
-          "音楽をアップロード - MP3ファイルを追加（一度に最大5つまで）",
+          "音楽をアップロード - MP3・WAV・M4Aファイルを追加（一度に最大5つまで）",
           "設定を調整 - 希望のBPMと音量を設定",
           "ダウンロード＆ラン - テンポ同期された音楽をワークアウトの準備に"
         ]
