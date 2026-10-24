@@ -85,6 +85,22 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             blockquote: ({children}) => (
               <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4">{children}</blockquote>
             ),
+            hr: () => <hr className="my-8 border-t border-gray-200" />,
+            // Tables are wrapped so a wide one scrolls on a phone instead of
+            // stretching the article. Nothing styles these by default here:
+            // @tailwindcss/typography is installed but not registered, so the
+            // `prose` class above is inert and every element needs its own rule.
+            table: ({children}) => (
+              <div className="my-6 overflow-x-auto">
+                <table className="w-full border-collapse text-left text-sm">{children}</table>
+              </div>
+            ),
+            thead: ({children}) => <thead className="bg-gray-50">{children}</thead>,
+            tr: ({children}) => <tr className="border-b border-gray-200">{children}</tr>,
+            th: ({children}) => (
+              <th className="px-3 py-2 font-semibold text-gray-900">{children}</th>
+            ),
+            td: ({children}) => <td className="px-3 py-2 text-gray-700">{children}</td>,
             // @ts-expect-error - inline is a valid prop for code elements in ReactMarkdown
             code: ({inline, children}) => 
               inline ? (
