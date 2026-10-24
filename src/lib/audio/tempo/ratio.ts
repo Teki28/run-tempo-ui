@@ -118,6 +118,40 @@ export function chooseRatio(
   });
 }
 
+/** The slowest and fastest click a given song can be made to produce. */
+export interface ReachableRange {
+  minBpm: number;
+  maxBpm: number;
+}
+
+/**
+ * The band of cadences a song can actually deliver.
+ *
+ * The click is always `songBpm * ratio * playbackRate`, so the extremes fall
+ * out of the smallest and largest allowed ratio at the full stretch limit.
+ * The UI shows this on the BPM slider: the slider offers 30-300 for every
+ * song, but an 80 BPM track can only reach 37-346, and the user should not
+ * have to press play to find that out.
+ */
+export function reachableRange(
+  songBpm: number,
+  { ratios = CLICK_RATIOS, maxStretchPct = DEFAULT_MAX_STRETCH_PCT }: RatioOptions = {},
+): ReachableRange {
+  if (!Number.isFinite(songBpm) || songBpm <= 0) {
+    throw new RangeError(`songBpm must be a positive number, got ${songBpm}`);
+  }
+  if (ratios.length === 0) throw new RangeError('ratios must not be empty');
+  if (maxStretchPct < 0) {
+    throw new RangeError(`maxStretchPct must not be negative, got ${maxStretchPct}`);
+  }
+
+  const limit = maxStretchPct / 100;
+  return {
+    minBpm: songBpm * Math.min(...ratios) * (1 - limit),
+    maxBpm: songBpm * Math.max(...ratios) * (1 + limit),
+  };
+}
+
 /**
  * The "leave my song alone" fallback offered when the gap is too wide: click on
  * the song's own cadence at the chosen ratio, with no stretching.

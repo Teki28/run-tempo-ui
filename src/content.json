@@ -29,7 +29,9 @@
         "processing": "Processing"
       },
       "bpmControls": {
-        "volume": "Volume"
+        "volume": "Volume",
+        "reachable": "This song reaches {min}–{max} BPM",
+        "reachableNote": "Limit: the song’s own {song} BPM × 0.5–4, stretched at most ±{limit}%."
       },
       "features": {
         "perfectTempo": {
@@ -82,7 +84,8 @@
           "1": "every beat",
           "2": "every half-beat",
           "0.5": "every other beat",
-          "1.5": "3 clicks per 2 beats"
+          "1.5": "3 clicks per 2 beats",
+          "4": "4 clicks per beat"
         },
         "tooFarTitle": "This song is far from your cadence",
         "tooFarBody": "Stretching is capped at {limit}%, which gets the click to {effective} BPM — {gap} BPM off your {target} target.",
@@ -126,7 +129,9 @@
         "processing": "处理中"
       },
       "bpmControls": {
-        "volume": "音量"
+        "volume": "音量",
+        "reachable": "这首歌可达 {min}–{max} BPM",
+        "reachableNote": "上限由歌曲决定：{song} BPM × 0.5–4，再变速最多 ±{limit}%。"
       },
       "features": {
         "perfectTempo": {
@@ -179,7 +184,8 @@
           "1": "每拍",
           "2": "每半拍",
           "0.5": "每隔一拍",
-          "1.5": "每两拍三下"
+          "1.5": "每两拍三下",
+          "4": "每拍四下"
         },
         "tooFarTitle": "这首歌与你的步频相差较大",
         "tooFarBody": "变速上限为 {limit}%，节拍器只能达到 {effective} BPM — 与目标 {target} 相差 {gap} BPM。",
@@ -223,7 +229,9 @@
         "processing": "処理中"
       },
       "bpmControls": {
-        "volume": "ボリューム"
+        "volume": "ボリューム",
+        "reachable": "この曲で出せるのは {min}〜{max} BPM",
+        "reachableNote": "上限は曲しだい：{song} BPM × 0.5〜4、さらに最大 ±{limit}% の変速。"
       },
       "features": {
         "perfectTempo": {
@@ -276,7 +284,8 @@
           "1": "毎拍",
           "2": "半拍ごと",
           "0.5": "1拍おき",
-          "1.5": "2拍に3回"
+          "1.5": "2拍に3回",
+          "4": "1拍に4回"
         },
         "tooFarTitle": "この曲はあなたのケイデンスから離れています",
         "tooFarBody": "テンポ変更は最大 {limit}% のため、クリックは {effective} BPM までです — 目標 {target} との差は {gap} BPM です。",
