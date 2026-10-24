@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "node scripts/dev.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "dev:raw": "next dev --turbopack",
+    "test-audio": "node scripts/make-test-audio.mjs test-audio"
   },
   "dependencies": {
     "@breezystack/lamejs": "^1.2.7",
@@ -27,6 +29,7 @@
     "react-dropzone": "^14.3.8",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "soundtouchjs": "^0.3.0",
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {

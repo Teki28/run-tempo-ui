@@ -29,8 +29,7 @@
         "processing": "Processing"
       },
       "bpmControls": {
-        "volume": "Volume",
-        "pauseToAdjust": "Paused playback is required to adjust BPM or volume."
+        "volume": "Volume"
       },
       "features": {
         "perfectTempo": {
@@ -58,6 +57,41 @@
           "Adjust Settings - Set your desired BPM and volume",
           "Download & Run - Get your tempo-synced music ready for your workout"
         ]
+      },
+      "tempo": {
+        "sectionTitle": "Beat sync",
+        "songTempo": "Song tempo",
+        "clickTempo": "Click",
+        "ratio": "Ratio",
+        "stretch": "Stretch",
+        "noStretch": "none",
+        "beatLocked": "Clicks are locked to this song's own beats",
+        "gridFallback": "No steady beat found — clicking on an even grid instead",
+        "analysing": "Finding the beat…",
+        "notAnalysed": "Press play or download to find this song’s beats",
+        "phases": {
+          "preparing": "Decoding",
+          "decimating": "Preparing audio",
+          "onsets": "Finding onsets",
+          "tempo": "Estimating tempo",
+          "tracking": "Tracking beats",
+          "stretching": "Time-stretching",
+          "encoding": "Encoding"
+        },
+        "ratios": {
+          "1": "every beat",
+          "2": "every half-beat",
+          "0.5": "every other beat",
+          "1.5": "3 clicks per 2 beats"
+        },
+        "tooFarTitle": "This song is far from your cadence",
+        "tooFarBody": "Stretching is capped at {limit}%, which gets the click to {effective} BPM — {gap} BPM off your {target} target.",
+        "snapAction": "Snap to the song instead ({natural} BPM)",
+        "snapActive": "Clicking on the song’s own cadence ({natural} BPM)",
+        "snapUndo": "Back to my {target} target",
+        "nudge": "Nudge",
+        "nudgeHint": "Shift every click earlier or later",
+        "maxStretch": "Max stretch"
       }
     },
     "footer": "Perfect for runners, joggers, and anyone who wants to maintain a consistent pace during their workouts."
@@ -92,8 +126,7 @@
         "processing": "处理中"
       },
       "bpmControls": {
-        "volume": "音量",
-        "pauseToAdjust": "需要先暂停播放，才能调整 BPM 和音量。"
+        "volume": "音量"
       },
       "features": {
         "perfectTempo": {
@@ -121,6 +154,41 @@
           "调整设置 - 设定你想要的 BPM 和音量",
           "下载并开跑 - 获得你的节奏同步音乐，为你的锻炼做好准备"
         ]
+      },
+      "tempo": {
+        "sectionTitle": "节拍同步",
+        "songTempo": "歌曲速度",
+        "clickTempo": "节拍器",
+        "ratio": "倍率",
+        "stretch": "变速",
+        "noStretch": "无",
+        "beatLocked": "节拍器已对齐到这首歌自身的节拍",
+        "gridFallback": "未找到稳定节拍 — 改用均匀网格",
+        "analysing": "正在检测节拍…",
+        "notAnalysed": "点击播放或下载以检测这首歌的节拍",
+        "phases": {
+          "preparing": "解码中",
+          "decimating": "预处理音频",
+          "onsets": "检测起音",
+          "tempo": "估算速度",
+          "tracking": "跟踪节拍",
+          "stretching": "变速处理",
+          "encoding": "编码中"
+        },
+        "ratios": {
+          "1": "每拍",
+          "2": "每半拍",
+          "0.5": "每隔一拍",
+          "1.5": "每两拍三下"
+        },
+        "tooFarTitle": "这首歌与你的步频相差较大",
+        "tooFarBody": "变速上限为 {limit}%，节拍器只能达到 {effective} BPM — 与目标 {target} 相差 {gap} BPM。",
+        "snapAction": "改用歌曲自身的速度（{natural} BPM）",
+        "snapActive": "正在使用歌曲自身的速度（{natural} BPM）",
+        "snapUndo": "回到我的目标 {target}",
+        "nudge": "微调",
+        "nudgeHint": "让所有节拍提前或延后",
+        "maxStretch": "最大变速"
       }
     },
     "footer": "非常适合跑步者、慢跑者以及任何希望在锻炼时保持稳定节奏的人。"
@@ -155,8 +223,7 @@
         "processing": "処理中"
       },
       "bpmControls": {
-        "volume": "ボリューム",
-        "pauseToAdjust": "BPMと音量を調整するには、再生を一時停止してください。"
+        "volume": "ボリューム"
       },
       "features": {
         "perfectTempo": {
@@ -184,6 +251,41 @@
           "設定を調整 - 希望のBPMと音量を設定",
           "ダウンロード＆ラン - テンポ同期された音楽をワークアウトの準備に"
         ]
+      },
+      "tempo": {
+        "sectionTitle": "ビート同期",
+        "songTempo": "曲のテンポ",
+        "clickTempo": "クリック",
+        "ratio": "倍率",
+        "stretch": "テンポ変更",
+        "noStretch": "なし",
+        "beatLocked": "クリックはこの曲のビートに同期しています",
+        "gridFallback": "安定したビートが見つかりません — 等間隔で鳴らします",
+        "analysing": "ビートを検出中…",
+        "notAnalysed": "再生またはダウンロードでこの曲のビートを検出します",
+        "phases": {
+          "preparing": "デコード中",
+          "decimating": "音声を準備中",
+          "onsets": "立ち上がりを検出中",
+          "tempo": "テンポを推定中",
+          "tracking": "ビートを追跡中",
+          "stretching": "テンポ変更中",
+          "encoding": "エンコード中"
+        },
+        "ratios": {
+          "1": "毎拍",
+          "2": "半拍ごと",
+          "0.5": "1拍おき",
+          "1.5": "2拍に3回"
+        },
+        "tooFarTitle": "この曲はあなたのケイデンスから離れています",
+        "tooFarBody": "テンポ変更は最大 {limit}% のため、クリックは {effective} BPM までです — 目標 {target} との差は {gap} BPM です。",
+        "snapAction": "曲本来のテンポに合わせる（{natural} BPM）",
+        "snapActive": "曲本来のテンポで鳴らしています（{natural} BPM）",
+        "snapUndo": "目標 {target} に戻す",
+        "nudge": "微調整",
+        "nudgeHint": "すべてのクリックを前後にずらします",
+        "maxStretch": "最大テンポ変更"
       }
     },
     "footer": "ランナー、ジョガー、そしてワークアウト中に一定のペースを維持したいすべての人に最適です。"
