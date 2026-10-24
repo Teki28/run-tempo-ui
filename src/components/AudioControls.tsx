@@ -7,6 +7,7 @@ import {
   DEFAULT_MAX_STRETCH_PCT,
   loadClick,
   planClicks,
+  reachableRange,
   resolvePlan,
   type MixPlan,
   type MixSettings,
@@ -54,6 +55,17 @@ export default function AudioControls({ lang, files }: AudioControlsProps) {
   const settings: MixSettings = useMemo(
     () => ({ bpm, volume, nudgeMs, snap, maxStretchPct: DEFAULT_MAX_STRETCH_PCT }),
     [bpm, volume, nudgeMs, snap],
+  );
+
+  // What this song can actually deliver, for the band under the BPM slider.
+  // Only meaningful once the beats are known: on the fixed-grid fallback any
+  // target is met exactly, so there is no band to draw.
+  const reachable = useMemo(
+    () =>
+      plan?.beatLocked && plan.songBpm !== null
+        ? reachableRange(plan.songBpm, { maxStretchPct: DEFAULT_MAX_STRETCH_PCT })
+        : null,
+    [plan?.beatLocked, plan?.songBpm],
   );
 
   // One player for the life of the component. Created lazily so no
@@ -214,6 +226,9 @@ export default function AudioControls({ lang, files }: AudioControlsProps) {
         onVolumeChange={setVolume}
         defaultBpm={bpm}
         defaultVolume={volume}
+        reachable={reachable}
+        songBpm={plan?.songBpm ?? null}
+        maxStretchPct={DEFAULT_MAX_STRETCH_PCT}
       />
 
       <TempoPanel

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { chooseRatio, needsSnapOffer, snapToSong } from './ratio';
+import { chooseRatio, needsSnapOffer, reachableRange, snapToSong } from './ratio';
 
 describe('chooseRatio', () => {
   describe('the four cases from the spec, at the default 8% limit', () => {
@@ -119,5 +119,63 @@ describe('chooseRatio', () => {
   it('rejects an empty ratio set and a negative limit', () => {
     expect(() => chooseRatio(120, 170, { ratios: [] })).toThrow(RangeError);
     expect(() => chooseRatio(120, 170, { maxStretchPct: -1 })).toThrow(RangeError);
+  });
+});
+
+describe('x4, which the default ratio set now includes', () => {
+  it('lets an 80 BPM song reach a 300 target it could not reach on x2', () => {
+    const choice = chooseRatio(80, 300);
+    expect(choice.ratio).toBe(4);
+    expect(choice.naturalBpm).toBe(320);
+    expect(choice.outcome).toBe('stretched');
+    expect(choice.effectiveBpm).toBeCloseTo(300, 10);
+    expect(needsSnapOffer(choice)).toBe(false);
+  });
+
+  it('is not preferred when a gentler ratio reaches the target', () => {
+    // 85 -> 170 is exact on x2; x4 would be 340 and nowhere near.
+    expect(chooseRatio(85, 170).ratio).toBe(2);
+    // The ordinary running cases must not move.
+    expect(chooseRatio(174, 170).ratio).toBe(1);
+    expect(chooseRatio(120, 170).ratio).toBe(1.5);
+  });
+
+  it('leaves a band between x2 and x4 that no stretch can cover', () => {
+    // 80 x 2 x 1.08 = 172.8 and 80 x 4 x 0.92 = 294.4, so 200 falls in the
+    // gap and comes out clamped whichever side it lands on.
+    const choice = chooseRatio(80, 200);
+    expect(choice.outcome).toBe('clamped');
+    expect(needsSnapOffer(choice)).toBe(true);
+  });
+});
+
+describe('reachableRange', () => {
+  it('spans the smallest and largest ratio at the full stretch limit', () => {
+    const { minBpm, maxBpm } = reachableRange(80);
+    expect(minBpm).toBeCloseTo(80 * 0.5 * 0.92, 10); // 36.8
+    expect(maxBpm).toBeCloseTo(80 * 4 * 1.08, 10); // 345.6
+  });
+
+  it('agrees with what chooseRatio can actually deliver at the edges', () => {
+    const song = 128;
+    const { minBpm, maxBpm } = reachableRange(song);
+    expect(chooseRatio(song, maxBpm).effectiveBpm).toBeCloseTo(maxBpm, 6);
+    expect(chooseRatio(song, minBpm).effectiveBpm).toBeCloseTo(minBpm, 6);
+    // A hair beyond either edge can no longer be met.
+    expect(chooseRatio(song, maxBpm * 1.01).outcome).toBe('clamped');
+    expect(chooseRatio(song, minBpm * 0.99).outcome).toBe('clamped');
+  });
+
+  it('honours a custom ratio set and limit', () => {
+    const { minBpm, maxBpm } = reachableRange(100, { ratios: [1, 2], maxStretchPct: 0 });
+    expect(minBpm).toBeCloseTo(100, 10);
+    expect(maxBpm).toBeCloseTo(200, 10);
+  });
+
+  it('rejects nonsense input the same way chooseRatio does', () => {
+    expect(() => reachableRange(0)).toThrow(RangeError);
+    expect(() => reachableRange(Number.NaN)).toThrow(RangeError);
+    expect(() => reachableRange(120, { ratios: [] })).toThrow(RangeError);
+    expect(() => reachableRange(120, { maxStretchPct: -1 })).toThrow(RangeError);
   });
 });

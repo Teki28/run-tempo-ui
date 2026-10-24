@@ -11,8 +11,8 @@ export {
 export { UnsupportedAudioError } from './decode';
 export { beatTimes } from './beats';
 export { clickTimes, fallbackClickTimes } from './clicks/schedule';
-export { chooseRatio, needsSnapOffer, snapToSong } from './tempo/ratio';
-export type { RatioChoice, RatioOutcome } from './tempo/ratio';
+export { chooseRatio, needsSnapOffer, reachableRange, snapToSong } from './tempo/ratio';
+export type { RatioChoice, RatioOutcome, ReachableRange } from './tempo/ratio';
 export { isUsable, MIN_BEAT_STRENGTH, MIN_PERIODICITY } from './analysis/detect';
 export type { AnalysisStage, BeatAnalysis } from './analysis/detect';
 export { planClicks, planMix } from './plan';

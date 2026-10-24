@@ -64,8 +64,11 @@ export const MAX_DETECT_BPM = 210;
 
 /** Multiples of the song's own beat rate we are willing to click on. An 85 BPM
  *  song reaches a 170 cadence at x2 with no stretching; 1.5 covers the
- *  three-against-two cases. Widening this to 3 or 4 is a one-line change. */
-export const CLICK_RATIOS = [0.5, 1, 1.5, 2] as const;
+ *  three-against-two cases. x4 exists so a slow song can still reach a fast
+ *  target: an 80 BPM track tops out at 173 on x2, but reaches 300 on x4.
+ *  Note there is no x3, so between x2 and x4 there is a band no song can
+ *  land in — 173 to 294 for that same 80 BPM track. Adding 3 closes it. */
+export const CLICK_RATIOS = [0.5, 1, 1.5, 2, 4] as const;
 
 /** Largest tempo change we will apply to the music, as a percentage. Past
  *  roughly 10% the stretch stops being transparent and starts sounding wrong. */
