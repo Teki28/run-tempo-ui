@@ -133,12 +133,7 @@ export default function AudioUploader({ lang, onReady, onError }: AudioUploaderP
               ))}
             </ul>
           </div>
-          <AudioControls
-            key={generation}
-            lang={lang}
-            files={tracks.files}
-            preview={tracks.preview}
-          />
+          <AudioControls key={generation} lang={lang} files={tracks.files} />
         </div>
       )}
 
